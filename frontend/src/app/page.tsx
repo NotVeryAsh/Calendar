@@ -1,4 +1,3 @@
-import Link from "next/link";
 import LinkButton from "@/app/ui/link-button";
 
 export default function Home() {
