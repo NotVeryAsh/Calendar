@@ -5,12 +5,14 @@ import {redirect, useSearchParams} from "next/navigation";
 import {useEffect} from "react";
 import sendRequest from "@/app/lib/request";
 import {setToken} from "@/app/lib/auth";
+import {setErrorMessage} from "@/app/lib/session";
 
 const getGoogleAuthCode = async (code, scope) => {
     const response = await sendRequest(`/api/auth-code?code=${code}&scope=${scope}`, "GET");
 
     if(response.status !== 200) {
-        throw new Error('Failed to login with Google');
+        await setErrorMessage('Could not log you in with Google')
+        redirect('/')
     }
 
     const json = await response.json();
