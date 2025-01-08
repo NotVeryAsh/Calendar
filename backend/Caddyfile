@@ -1,0 +1,10 @@
+localhost {
+    root * /app/public
+    encode zstd gzip
+    file_server
+    php_fastcgi php:9000
+    @dotFiles {
+      path */.*
+      not path /.well-known/*
+    }
+}
