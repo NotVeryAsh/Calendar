@@ -5,6 +5,8 @@ import sendRequest from "@/app/lib/request";
 import {redirect} from "next/navigation";
 import {useEffect, useState} from "react";
 import {clearSession} from "@/app/lib/session";
+import Modal from "@/app/components/Modal";
+import Button from "@/app/components/Button";
 
 const onClickGoogleLogin = async (setErrorMessage) => {
     const baseUrl = `${window.location.protocol}//${window.location.host}`;
@@ -41,6 +43,16 @@ export default function Home() {
                 Sign in with Google <FontAwesomeIcon icon={faGoogle} className={"ml-1"} />
             </button>
             <div>&nbsp;</div>
+            <Modal hidden={false}>
+                <Modal.Content>
+                    Test
+                </Modal.Content>
+                <Modal.Footer>
+                    <Button>
+                        Close
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </div>
     );
 }

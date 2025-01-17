@@ -3,7 +3,6 @@ services:
     php:
         image: php-8.3
         build:
-            context: backend
             dockerfile: ./docker/Dockerfile
         volumes:
             - ./:/app
