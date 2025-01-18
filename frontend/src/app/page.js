@@ -43,16 +43,6 @@ export default function Home() {
                 Sign in with Google <FontAwesomeIcon icon={faGoogle} className={"ml-1"} />
             </button>
             <div>&nbsp;</div>
-            <Modal hidden={false}>
-                <Modal.Content>
-                    Test
-                </Modal.Content>
-                <Modal.Footer>
-                    <Button>
-                        Close
-                    </Button>
-                </Modal.Footer>
-            </Modal>
         </div>
     );
 }

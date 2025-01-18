@@ -22,6 +22,8 @@ class LoginController extends Controller
         $client = new Client();
 
         // TODO try catch
+        // TOTO Check error codes / messages and see if we can make a more customisable return message instead of a
+        // generic error code like 'could not log you in'
         $client->setAuthConfig(base_path('client-secret.json'));
         $client->addScope([
             Calendar::CALENDAR,

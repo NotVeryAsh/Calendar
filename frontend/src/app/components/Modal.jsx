@@ -1,3 +1,5 @@
+import Button from "@/app/components/Button";
+
 export default function Modal({hidden=true, children}) {
     
     const hiddenClass = hidden ? "hidden": ""
@@ -20,10 +22,16 @@ const Header = ({children}) => {
 
 }
 
-const Footer = ({children}) => {
+const Footer = ({setModalHidden, children}) => {
     return (
         <div className="flex bg-gray-50 px-4 py-3 items-end flex-row-reverse">
-            {children}
+            { children ? (
+                children
+            ): (
+                <Button onClick={() => {setModalHidden(true)}}>
+                    Close
+                </Button>
+            )}
         </div>
     )
 }
