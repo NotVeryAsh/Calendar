@@ -4,7 +4,8 @@ import dayGridPlugin from '@fullcalendar/daygrid'
 import sendRequest from "@/app/lib/request";
 import {useEffect, useState} from "react";
 import Modal from "@/app/components/Modal";
-
+import PreviewEventModal from "@/app/components/PreviewEventModal";
+import moment from "moment";
 
 export default function Calendar() {
 
@@ -15,11 +16,14 @@ export default function Calendar() {
     }, [])
 
     const [events, setEvents] = useState([]);
-    const [hideModal, setHideModal] = useState(false)
+    const [selectedEvent, setSelectedEvent] = useState(undefined)
+    const [hideModal, setHideModal] = useState(true)
 
     return (
         <>
-            <Modal hidden={hideModal}/>
+            {selectedEvent &&
+                <PreviewEventModal hideModal={hideModal} setHideModal={setHideModal} event={selectedEvent}/>
+            }
             <FullCalendar
                 plugins={[
                     dayGridPlugin,
@@ -36,7 +40,7 @@ export default function Calendar() {
                     month: 'long',
                 }}
                 eventBackgroundColor={"#34d399"}
-                eventClick={handleClickEvent}
+                eventClick={(info) => handleClickEvent(info, setHideModal, setSelectedEvent)}
             />
         </>
     );
@@ -53,6 +57,7 @@ const getEvents = async () => {
     return json.events;
 }
 
-const handleClickEvent = (info, setModalOpen) => {
-    setModalOpen(true)
+const handleClickEvent = (info, setHideModal, setSelectedEvent) => {
+    setSelectedEvent(info.event)
+    setHideModal(false)
 }

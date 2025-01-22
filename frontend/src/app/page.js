@@ -39,6 +39,7 @@ export default function Home() {
             {errorMessage && (
                 errorMessage
             )}
+            {/* TODO Disable / add loading state to button */}
             <button onClick={() => {onClickGoogleLogin(setErrorMessage)}} className={"bg-blue-500 px-2 py-4 text-white font-semibold rounded-xl my-auto text-lg mx-5 drop-shadow-lg"}>
                 Sign in with Google <FontAwesomeIcon icon={faGoogle} className={"ml-1"} />
             </button>

@@ -15,11 +15,12 @@ class EventController extends Controller
         $client->setAuthConfig(base_path('client-secret.json'));
         $client->setAccessToken($request->header('Authorization'));
 
-        // TODO Get events from this
-        // Below code gets user's calendar
+        // Get user's calendar
         $calendar = new Calendar($client);
 
         $events = collect($calendar->events->listEvents("primary"))->map(function ($event) {
+            // TODO Add all relevant properties
+            // TODO Allow user to choose custom color for event - or preset from google's colors
             return [
                 "id" => $event->id,
                 "title" => $event->summary,
