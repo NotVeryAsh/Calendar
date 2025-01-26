@@ -24,7 +24,7 @@ const Header = ({children}) => {
 
 const Title = ({children}) => {
     return (
-        <div className={"text-center font-bold mb-3 text-xl"}>
+        <div className={"text-center font-bold mb-4 text-2xl flex flex-col"}>
             {children}
         </div>
     )
@@ -46,7 +46,7 @@ const Footer = ({setHideModal, children}) => {
 
 const Content = ({children}) => {
     return (
-        <div className="bg-white px-4 pb-4 pt-5 text-sm space-y-1">
+        <div className="bg-white px-4 pb-4 pt-5 space-y-1 text-base">
             {children}
         </div>
     )
