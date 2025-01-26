@@ -8,3 +8,4 @@ Route::get('auth-url', [LoginController::class, 'getAuthUrl']);
 Route::get('auth-code', [LoginController::class, 'getAuthCode']);
 
 Route::get('events', [EventController::class, 'index']);
+Route::put('event/{eventId}', [EventController::class, 'update']);

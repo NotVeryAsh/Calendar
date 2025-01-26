@@ -2,24 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use Google\Service\Calendar;
-use Illuminate\Http\Request;
-use Google\Client;
-use Illuminate\Support\Carbon;
+use App\Facades\Event;
+use App\Facades\Response;
+use App\Http\Requests\Event\UpdateEventRequest;
+use Illuminate\Support\Facades\Log;
 
 class EventController extends Controller
 {
-    public function index(Request $request)
-    {
-        $client = new Client();
-        $client->setAuthConfig(base_path('client-secret.json'));
-        $client->setAccessToken($request->header('Authorization'));
-
-        // Get user's calendar
-        $calendar = new Calendar($client);
-
-        $events = collect($calendar->events->listEvents("primary"))->map(function ($event) {
-            // TODO Add all relevant properties
+    public function index()
+    {        
+        $events = collect(Event::getEvents("primary"))->map(function ($event) {
+            // TODO Add all relevant properties eg. calendar color, link, other people invited etc.
             // TODO Allow user to choose custom color for event - or preset from google's colors
             return [
                 "id" => $event->id,
@@ -29,6 +22,13 @@ class EventController extends Controller
             ];
         });
 
-        return response()->json(['events' => $events]);
+        return Response::respond(['events' => $events]);
+    }
+    
+    public function update($eventId, UpdateEventRequest $request)
+    {        
+        $event = Event::updateEvent('primary', $eventId, $request->validated());
+
+        return response()->json(['event' => $event]);
     }
 }
