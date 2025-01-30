@@ -3,9 +3,7 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from '@fullcalendar/daygrid'
 import sendRequest from "@/app/lib/request";
 import {useEffect, useState} from "react";
-import Modal from "@/app/components/Modal";
-import PreviewEventModal from "@/app/components/PreviewEventModal";
-import moment from "moment";
+import PreviewEventModal from "@/app/components/Event/PreviewEventModal";
 
 export default function Calendar() {
 

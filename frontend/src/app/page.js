@@ -5,8 +5,6 @@ import sendRequest from "@/app/lib/request";
 import {redirect} from "next/navigation";
 import {useEffect, useState} from "react";
 import {clearSession} from "@/app/lib/session";
-import Modal from "@/app/components/Modal";
-import Button from "@/app/components/Button";
 
 const onClickGoogleLogin = async (setErrorMessage) => {
     const baseUrl = `${window.location.protocol}//${window.location.host}`;
@@ -31,6 +29,7 @@ export default function Home() {
     }, []);
     
     const [errorMessage, setErrorMessage] = useState(null);
+    const [loginButtonDisabled, setLoginButtonDisabled] = useState(false)
     
     return (
         <div className={"flex flex-col p-2 h-screen justify-between py-20"}>
@@ -39,8 +38,12 @@ export default function Home() {
             {errorMessage && (
                 errorMessage
             )}
-            {/* TODO Disable / add loading state to button */}
-            <button onClick={() => {onClickGoogleLogin(setErrorMessage)}} className={"bg-blue-500 px-2 py-4 text-white font-semibold rounded-xl my-auto text-lg mx-5 drop-shadow-lg"}>
+            {/* If endpoint fails, un-disable button */}
+            <button 
+                onClick={() => {onClickGoogleLogin(setErrorMessage); setLoginButtonDisabled(true)}}
+                className={"bg-blue-500 px-2 py-4 text-white font-semibold rounded-xl my-auto text-lg mx-5 drop-shadow-lg disabled:bg-blue-500 disabled:opacity-75"}
+                disabled={loginButtonDisabled}
+            >
                 Sign in with Google <FontAwesomeIcon icon={faGoogle} className={"ml-1"} />
             </button>
             <div>&nbsp;</div>

@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Facades\Event;
 use App\Facades\Response;
 use App\Http\Requests\Event\UpdateEventRequest;
-use Illuminate\Support\Facades\Log;
 
 class EventController extends Controller
 {

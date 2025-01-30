@@ -2,30 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-}
-
 .fc-daygrid-day-top {
   text-align: center;
 }
 
 .fc-theme-standard td, fc-event {
   border: 0
+}
+
+.MuiStack-root {
+  padding: 0 !important;
 }
 
 .fc-daygrid-day-number {
@@ -35,7 +21,6 @@ body {
   margin-left: auto;
   margin-right: auto;
   background-color: #e2e8f0;
-  /*background-color:rgba(226, 232, 240, 0.4);*/
   background-color:rgba(241, 245, 249, 0);
 }
 

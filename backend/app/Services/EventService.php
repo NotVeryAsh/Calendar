@@ -187,6 +187,72 @@ class EventService
      */
     private function setEventData(GoogleEvent $event, $data): GoogleEvent
     {
+        // TODO Data to explore / set:
+        // Grouped data means we can possibly put them into their own section together:
+
+        // ** recurrence
+        // recurrence
+        // Recurring event id
+        
+        // ** attendees
+        // Anyone can add self
+        // Attendees
+        // attendees omitted
+        // guests can invite others
+        // guests can modify
+        // guests can see other guests
+        
+        // birthday properties
+        // color id - Eventually allow user to update colors as well
+        // conference data
+        
+        // ** creator        
+        // created
+        // creator
+        // description
+        // organizer
+        
+        // ** time        
+        // original start time
+        // end time unspecified
+        
+        // ** call        
+        // Hangout link
+        // HTML link
+        // iCalUID
+        
+        // Event type
+        // set kind
+
+        // ** location        
+        // out of office properties
+        // working location properties
+        // location
+
+        // ** transparency        
+        // transparency
+        // visibility
+
+        // ** private        
+        // private copy
+        // locked
+        
+        // ** settings        
+        // NOTE: meta?
+        // status
+        // updated
+        // set id
+        // etag
+
+        // reminders
+        
+        // Attachments
+        // extended properties
+        // focus time properties
+        // gadget
+        // sequence
+        // source
+        
         foreach($data as $key => $value) {
     
             if(in_array($key, self::DATE_FIELDS)) {
