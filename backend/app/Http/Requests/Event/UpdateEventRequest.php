@@ -26,7 +26,19 @@ class UpdateEventRequest extends FormRequest
                 'required',
                 'date',
                 'after_or_equal:start',
-            ]
+            ],
+            "guestsCanModify" => [
+                'nullable',
+                'bool'
+            ],
+            "guestsCanInviteOthers" => [
+                'nullable',
+                'bool'
+            ],
+            "guestsCanSeeOtherGuests" => [
+                'nullable',
+                'bool'
+            ],
         ];
     }
 }

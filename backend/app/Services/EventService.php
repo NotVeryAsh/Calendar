@@ -36,6 +36,13 @@ class EventService
     ];
 
     /**
+     * Fields that have to be set first - other fields may depend on the value of these fields
+     */
+    private const PRIORITY_FIELDS = [
+        'guestsCanModify'
+    ];
+
+    /**
      * Create the client and set the config credentials to authorize with the API
      * 
      * @return Client|JsonResponse
@@ -115,7 +122,9 @@ class EventService
     {
         $this->authenticate();
         try {
+            \Log::info(json_encode($this->getCalendarService()->events->listEvents($calendarId)));
             return $this->getCalendarService()->events->listEvents($calendarId);
+            
         } catch (Exception $e) {
             Log::error($e->getMessage());
             return Response::respond([], 400, 'Something went wrong. Please try again later.');
@@ -135,9 +144,9 @@ class EventService
     public function updateEvent($calendarId, $eventId, $data, array $optParams = []): GoogleEvent|JsonResponse
     {
         $this->authenticate();
-        
+    
         $data = $this->updateDataKeys($data);
-        
+
         $event = Event::getEvent("primary", $eventId);
         $event = $this->setEventData($event, $data);
         try {
@@ -173,7 +182,7 @@ class EventService
             // Remove current key from data since Google does not use this key name
             unset($data[$key]);
         }
-
+        
         return array_merge($data, $newData);
     }
 
@@ -237,8 +246,7 @@ class EventService
         // private copy
         // locked
         
-        // ** settings        
-        // NOTE: meta?
+        // ** settings / meta?
         // status
         // updated
         // set id
@@ -252,6 +260,19 @@ class EventService
         // gadget
         // sequence
         // source
+
+        // Handle fields that must be set before others
+        foreach(self::PRIORITY_FIELDS as $priorityField) {
+            
+            $value = $data[$priorityField];
+            
+            // eg. setGuestsCanModify
+            $function = 'set' . ucfirst($priorityField);
+            $event->$function($value);
+            
+            // Remove from data since we have already processed this field
+            unset($data[$priorityField]);
+        }
         
         foreach($data as $key => $value) {
     
