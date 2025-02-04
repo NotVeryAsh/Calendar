@@ -12,7 +12,7 @@ export default function DateFieldsContent ({event}) {
     const endDay = endDate.format('dddd, MMM Do')
     
     return (
-        <>  
+        <>
             <span>
                 {startDay}{startDay !== endDay && (' - ' + endDay)}
             </span>

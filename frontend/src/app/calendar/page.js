@@ -38,7 +38,7 @@ export default function Calendar() {
                     month: 'long',
                 }}
                 eventBackgroundColor={"#34d399"}
-                eventClick={(info) => handleClickEvent(info, setHideModal, setSelectedEvent)}
+                eventClick={(info) => handleClickEvent(info, setHideModal, setSelectedEvent, events)}
             />
         </>
     );
@@ -55,7 +55,8 @@ const getEvents = async () => {
     return json.events;
 }
 
-const handleClickEvent = (info, setHideModal, setSelectedEvent) => {
-    setSelectedEvent(info.event)
+const handleClickEvent = (info, setHideModal, setSelectedEvent, events) => {
+    const event = events.find(event => event.id === info.event.id)
+    setSelectedEvent(event)
     setHideModal(false)
 }

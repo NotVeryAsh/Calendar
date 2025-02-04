@@ -17,6 +17,8 @@ import {
     faFont
 } from "@fortawesome/free-solid-svg-icons";
 import DateFieldsContent, {DateFieldsInputs} from "@/app/components/Event/DateFields";
+import AttendeeFieldsContent, {AttendeeFieldsInputs} from "@/app/components/Event/AttendeeFields";
+import EmailAutofill from "@/app/components/EmailAutofill";
 
 library.add(faBell, faUsers, faPalette, faClock, faLocationDot, faGear, faPhone, faFont)
 
@@ -32,7 +34,10 @@ export default function PreviewEventModal ({hideModal, setHideModal, event}) {
         endTime: moment(event.end),
         title: event.title,
         allDay: false,
-        timezone:  moment(event.start).format('z')
+        timezone:  moment(event.start).format('z'),
+        guestsCanInviteOthers: event.guestsCanInviteOthers,
+        guestsCanModify: event.guestsCanModify,
+        guestsCanSeeOtherGuests: event.guestsCanSeeOtherGuests
     })
     const [activeTab, setActiveTab] = useState(null)
 
@@ -121,9 +126,12 @@ const Content = ({event, activeTab}) => {
 
     return (
         <>
-        <Modal.Title>{event?.title}</Modal.Title>
+            <Modal.Title>{event?.title}</Modal.Title>
             <div className={"flex flex-col space-y-2"}>
-                { activeTab === 'dates' && <DateFieldsContent event={event} show={activeTab === 'dates'} /> }
+                {activeTab === 'dates' && <DateFieldsContent event={event}/>}
+            </div>
+            <div className={"flex flex-col space-y-2"}>
+                {activeTab === 'users' && <AttendeeFieldsContent event={event}/>}
             </div>
         </>
     )
@@ -142,7 +150,14 @@ const Form = ({formData, setFormData, activeTab}) => {
                     />
                 </Modal.Title>
                 <div className={"flex flex-col space-y-4"}>
-                    { activeTab === 'dates' && <DateFieldsInputs handleInputChange={handleInputChange} setFormData={setFormData} formData={formData} /> }
+                    {activeTab === 'dates' &&
+                        <DateFieldsInputs handleInputChange={handleInputChange} setFormData={setFormData}
+                                          formData={formData}/>}
+                </div>
+                <div className={"flex flex-col space-y-4"}>
+                    {activeTab === 'users' &&
+                        <AttendeeFieldsInputs handleInputChange={handleInputChange} setFormData={setFormData}
+                                          formData={formData}/>}
                 </div>
             </form>
         </>
@@ -151,11 +166,14 @@ const Form = ({formData, setFormData, activeTab}) => {
 
 
 const handleClickSave = async (event, formData) => {
-    
-     const data = {
-        start: moment(formData.startDate).format('MM/DD/YYYY') + ' ' + moment(formData.startTime).format('hh:mm A'),
-        end: moment(formData.endDate).format('MM/DD/YYYY') + ' ' + moment(formData.endTime).format('hh:mm A'),
-        title: formData.title 
+
+    const data = {
+        start: moment(formData.startDate).format('MM/DD/YYYY') + ' ' + moment(formData.startTime).format('hh:mm A') + ' ' + moment(event.start).format('z'),
+        end: moment(formData.endDate).format('MM/DD/YYYY') + ' ' + moment(formData.endTime).format('hh:mm A') + ' ' + moment(event.start).format('z'),
+        title: formData.title,
+        guestsCanInviteOthers: formData.guestsCanInviteOthers,
+        guestsCanModify: formData.guestsCanModify,
+        guestsCanSeeOtherGuests: formData.guestsCanSeeOtherGuests
     }
 
     // Call api to save data and show error messages where necessary
@@ -171,7 +189,6 @@ const handleClickSave = async (event, formData) => {
 const handleInputChange = (setFormData, formData, property, input) => {
     let value = input instanceof moment ? input : input.target.value
     value = input.target.type === 'checkbox' ? input.target.checked : input.target.value
-
     setFormData(prev => ({
         ...prev,
         [property]: value
