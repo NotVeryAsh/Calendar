@@ -198,68 +198,66 @@ class EventService
     {
         // TODO Data to explore / set:
         // Grouped data means we can possibly put them into their own section together:
+        // See https://developers.google.com/calendar/api/v3/reference/events
 
         // ** recurrence
-        // recurrence
-        // Recurring event id
+        // recurrence, see: https://developers.google.com/calendar/api/v3/reference/events#:~:text=default%20is%20False.-,recurrence%5B%5D,-list
+        // Recurring event id - the event that each recurrence is imitating / belongs to / the original it is copying (immutable)
         
         // ** attendees
-        // Anyone can add self
-        // Attendees
-        // attendees omitted
+        // Attendees: see https://developers.google.com/calendar/api/v3/reference/events#:~:text=writable-,attendees%5B%5D,-list
+        // attendees omitted - boolean - whether any of an event's attendees may have been excluded from the response when getting the event from Calendar API. This may be true if parameters such as maxAttendees is set to a lower number than the amount of attendees for that event (eg, the event has 100 attendees, but the maxAttendees parameter is set to 10, so only 10 attendees come back in the api response, meaning 90 of them were left out of the response)
         // guests can invite others
         // guests can modify
         // guests can see other guests
         
-        // birthday properties
+        // birthday properties (If event type is 'birthday')
         // color id - Eventually allow user to update colors as well
-        // conference data
+        // conference data: see https://developers.google.com/calendar/api/v3/reference/events#:~:text=writable-,conferenceData,-nested%20object
         
         // ** creator        
-        // created
-        // creator
-        // description
-        // organizer
+        // created (Read only)
+        // creator (Read only)
+        // description (Can contain HTML) (Check how we can safely validate and sanitize this)
+        // organizer (Read only except when importing an event)
         
         // ** time        
-        // original start time
-        // end time unspecified
+        // original start time (immutable, for recurring events, this is the time that the event is supposed to take place - this value does not change, even if you change the time that the reccuring event takes place)
         
         // ** call        
-        // Hangout link
-        // HTML link
-        // iCalUID
+        // Hangout link (read only) DONE
+        // HTML link (read only)
         
-        // Event type
-        // set kind
+        // Event type (cannot be edited after event created. See values: https://developers.google.com/calendar/api/v3/reference/events#:~:text=of%20the%20resource.-,eventType,-string)
+        // set kind (api docs do not specify that it is writable. Its value is calendar#event)
 
         // ** location        
-        // out of office properties
-        // working location properties
-        // location
+        // out of office properties (used if event type is out of office)
+        // working location properties - https://developers.google.com/calendar/api/v3/reference/events#:~:text=writable-,workingLocationProperties,-nested%20object
+        // location - geographic location of the event as free-form text (free-form meaning it has no limits or constraints) (maybe for this field, allow the user to pick a post on the google map, or enter a custom value eg. 'the coffee house'
 
         // ** transparency        
-        // transparency
-        // visibility
+        // transparency - whether the event blocks time on the calendar? could be availability? https://developers.google.com/calendar/api/v3/reference/events#:~:text=writable-,transparency,-string 
+        // visibility - 'default' - the default visibility status defined for that calendar, see: https://developers.google.com/calendar/api/v3/reference/events#:~:text=change.%20Read%2Donly.-,visibility,-string
 
         // ** private        
-        // private copy
-        // locked
+        // private copy (immutable after created. If set to true, event propagation is disabled (eg. if you make a change on the event on the organization's calendar, the changes won't be reflected for the attendees on their calendars))
+        // locked (read only boolean - if event was copied, the main fields cannot be edited (including summary, description, location, start, end recurrence)
         
         // ** settings / meta?
-        // status
-        // updated
-        // set id
-        // etag
+        // status - status of the event - 'confirmed', 'tentative', 'cancelled': see https://developers.google.com/calendar/api/v3/reference/events#:~:text=writable-,status,-string
+        // updated - a timestamp of the last time the event was updated
+        // set id (writable, but with restrictions: see https://developers.google.com/calendar/api/v3/reference/events#:~:text=events.get%20method.-,id,-string)
+        // etag - a string attached to objects which is changed anytime the resource is changed (eg. if we updated an event, the etag is changed) etags are used to check if a resource has been modified since a new etag is generated when the resource is modified
 
-        // reminders
+        // reminders - https://developers.google.com/calendar/api/v3/reference/events#:~:text=instance%20belongs.%20Immutable.-,reminders,-object
         
-        // Attachments
-        // extended properties
-        // focus time properties
-        // gadget
-        // sequence
-        // source
+        // Attachments: see https://developers.google.com/calendar/api/v3/reference/events#:~:text=writable-,attachments%5B%5D,-list
+        // extended properties: see https://developers.google.com/calendar/api/v3/reference/events#:~:text=writable-,extendedProperties,-object
+        // focus time properties: https://developers.google.com/calendar/api/v3/reference/events#:~:text=the%20corresponding%20value.-,focusTimeProperties,-nested%20object
+        // gadget (Deprecated)
+        // sequence (the revision sequence number of the event - a version number)
+        // source (the source which the even was created eg. a web page, or email message - can only be seen or modified by the creator of the event)
 
         // Handle fields that must be set before others
         foreach(self::PRIORITY_FIELDS as $priorityField) {

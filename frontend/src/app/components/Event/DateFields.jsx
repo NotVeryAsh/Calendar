@@ -2,11 +2,12 @@ import {DatePicker, DesktopTimePicker, LocalizationProvider} from "@mui/x-date-p
 import {AdapterMoment} from "@mui/x-date-pickers/AdapterMoment";
 import {DemoContainer} from "@mui/x-date-pickers/internals/demo";
 import moment from "moment-timezone";
+import {alignProperty} from "@mui/material/styles/cssUtils";
 
-export default function DateFieldsContent ({event}) {
+export default function DateFieldsContent ({event, formData}) {
 
-    const startDate = moment(event?.start.toISOString())
-    const endDate = moment(event?.end.toISOString())
+    const startDate = moment.tz(event?.start, formData.timezone)
+    const endDate = moment.tz(event?.end, formData.timezone)
 
     const startDay = startDate.format('dddd, MMM Do')
     const endDay = endDate.format('dddd, MMM Do')
@@ -38,15 +39,15 @@ export const DateFieldsInputs = ({handleInputChange, setFormData, formData}) => 
                         <DatePicker
                             label="Start Date"
                             className={formData.allDay === true ? '!w-full' : ''}
-                            value={formData.startDate}
+                            value={moment.tz(formData.startDate, formData.timezone)}
                             onChange={e => handleInputChange(setFormData, formData, 'startDate', e)}
                             sx={getInputStyle()}
                         />
                         <DesktopTimePicker
                             className={formData.allDay === true ? '!hidden' : ''}
                             label="Start Time"
-                            value={formData.startTime}
-                            onChange={e => handleInputChange(setFormData, formData, 'startTime', e)}
+                            value={moment.tz(formData.startTime, formData.timezone)}
+                            onChange={e => {handleInputChange(setFormData, formData, 'startTime', e); handleChangeTime(e, formData, setFormData, true)}}
                             sx={getInputStyle()}
                         />
                     </div>
@@ -60,15 +61,15 @@ export const DateFieldsInputs = ({handleInputChange, setFormData, formData}) => 
                         <DatePicker
                             label="End Date"
                             className={formData.allDay === true ? '!w-full' : ''}
-                            value={formData.endDate}
+                            value={moment.tz(formData.endDate, formData.timezone)}
                             onChange={e => handleInputChange(setFormData, formData, 'endDate', e)}
                             sx={getInputStyle()}
                         />
                         <DesktopTimePicker
                             className={formData.allDay === true ? '!hidden' : ''}
                             label="End Time"
-                            value={formData.endTime}
-                            onChange={e => handleInputChange(setFormData, formData, 'endTime', e)}
+                            value={moment.tz(formData.endTime, formData.timezone)}
+                            onChange={e => {handleInputChange(setFormData, formData, 'endTime', e); handleChangeTime(e, formData, setFormData, false)}}
                             sx={getInputStyle()}
                         />
                     </div>
@@ -77,15 +78,51 @@ export const DateFieldsInputs = ({handleInputChange, setFormData, formData}) => 
             <div className={"flex flex-col space-y-3"}>
                 <span className={" font-medium"}>Timezone</span>
                 <div className={"flex flex-col"}>
-                    <select
-                        className={"text-center p-2 border border-1 border-gray-400 rounded"}>
-                        {getTimezones().map((timezone => <option key={timezone.timezone}
-                                                                 value={timezone.timezone}>{timezone.label}</option>))}
+                    <select onChange={(e) => {handleSelectTimezone(e, setFormData, formData)}}
+                        className={"text-center p-2 border border-1 border-gray-400 rounded"} defaultValue={formData.timezone}>
+                        {getTimezones().map((timezone => (
+                            <option key={timezone.timezone} value={timezone.timezone}>
+                                {timezone.label}
+                            </option>
+                        )))}
                     </select>
                 </div>
             </div>
         </>
     )
+}
+
+const handleChangeTime = (value, formData, setFormData, start = false) => {
+    const timezone = formData.timezone
+    let property
+    if(start) {
+        property = 'originalStartTime' 
+    } else {
+        property = 'originalEndTime'
+    }
+
+    setFormData(prev => ({
+        ...prev,
+        ...{
+            [property]: moment.tz(value, timezone)
+        }
+    }));
+}
+
+const handleSelectTimezone = (e, setFormData, formData) => {
+    const timezone = e.target.value
+    setFormData(prev => ({
+        ...prev,
+        ...{
+            timezone: timezone,
+            startDate: moment.tz(formData.startDate.format(), timezone),
+            originalStartTime: moment.tz(formData.originalStartTime.format(), timezone),
+            startTime: moment.tz(formData.startTime.format(), timezone),
+            endDate: moment.tz(formData.endDate.format(), timezone),
+            originalEndTime: moment.tz(formData.originalEndTime.format(), timezone),
+            endTime: moment.tz(formData.endTime.format(), timezone),
+        }
+    }));
 }
 
 const handleAllDayChecked = (formData, setFormData, event) => {

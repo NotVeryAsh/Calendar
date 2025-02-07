@@ -35,7 +35,7 @@ const Header = ({children}) => {
 
 const Title = ({children}) => {
     return (
-        <div className={"text-center font-bold mb-4 text-2xl flex flex-col"}>
+        <div className={"text-center font-bold mb-6 text-2xl flex flex-col"}>
             {children}
         </div>
     )

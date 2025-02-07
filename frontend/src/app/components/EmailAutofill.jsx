@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useState} from "react";
 
 export default function EmailAutofill()
 {
@@ -41,6 +41,11 @@ const handleChange = (event, setSuggestedEmails, emails) => {
         setSuggestedEmails([])
         return;
     }
+    
+    // TODO Eventually, if comma entered, submit the email address if it is valid
+    // TODO Also submit email address on press enter key or select email from dropdown
+    // TODO When email from dropdown is clicked, replace all chars after @ symbol with selected email extension
+    // TODO Eventually, allow user to navigate with arrow keys on dropdown to select a value, and press enter to select
     
     input = input.substring(input.indexOf("@") + 1)
     

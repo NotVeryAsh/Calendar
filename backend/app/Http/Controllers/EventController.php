@@ -22,6 +22,9 @@ class EventController extends Controller
                 "guestsCanModify" => $event->getGuestsCanModify(),
                 "guestsCanInviteOthers" => $event->getGuestsCanInviteOthers(),
                 "guestsCanSeeOtherGuests" => $event->getGuestsCanSeeOtherGuests(),
+                'hangoutLink' => $event->getHangoutLink(),
+                'htmlLink' => $event->getHtmlLink(),
+                'timezone' => $event->getStart()->getTimeZone()
             ];
         });
 

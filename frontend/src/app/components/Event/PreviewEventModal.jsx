@@ -19,6 +19,8 @@ import {
 import DateFieldsContent, {DateFieldsInputs} from "@/app/components/Event/DateFields";
 import AttendeeFieldsContent, {AttendeeFieldsInputs} from "@/app/components/Event/AttendeeFields";
 import EmailAutofill from "@/app/components/EmailAutofill";
+import CallFieldsContent from "@/app/components/Event/CallFields";
+import {formatDate} from "@fullcalendar/core";
 
 library.add(faBell, faUsers, faPalette, faClock, faLocationDot, faGear, faPhone, faFont)
 
@@ -34,10 +36,12 @@ export default function PreviewEventModal ({hideModal, setHideModal, event}) {
         endTime: moment(event.end),
         title: event.title,
         allDay: false,
-        timezone:  moment(event.start).format('z'),
+        timezone: event.timezone,
         guestsCanInviteOthers: event.guestsCanInviteOthers,
         guestsCanModify: event.guestsCanModify,
-        guestsCanSeeOtherGuests: event.guestsCanSeeOtherGuests
+        guestsCanSeeOtherGuests: event.guestsCanSeeOtherGuests,
+        attendees: event.attendees,
+        attendeesOmitted: event.attendeesOmitted
     })
     const [activeTab, setActiveTab] = useState(null)
 
@@ -101,7 +105,7 @@ export default function PreviewEventModal ({hideModal, setHideModal, event}) {
             <Modal.Content>
                 {editMode ? 
                     (<Form event={event} formData={formData} setFormData={setFormData} activeTab={activeTab}/>) : 
-                    (<Content event={event} activeTab={activeTab}/>)
+                    (<Content event={event} activeTab={activeTab} formData={formData}/>)
                 }
             </Modal.Content>
             <Modal.Footer setHideModal={setHideModal}>
@@ -122,16 +126,15 @@ export default function PreviewEventModal ({hideModal, setHideModal, event}) {
     );
 }
 
-const Content = ({event, activeTab}) => {
+const Content = ({event, activeTab, formData}) => {
 
     return (
         <>
             <Modal.Title>{event?.title}</Modal.Title>
-            <div className={"flex flex-col space-y-2"}>
-                {activeTab === 'dates' && <DateFieldsContent event={event}/>}
-            </div>
-            <div className={"flex flex-col space-y-2"}>
+            <div className={"flex flex-col space-y-5"}>
+                {activeTab === 'dates' && <DateFieldsContent event={event} formData={formData}/>}
                 {activeTab === 'users' && <AttendeeFieldsContent event={event}/>}
+                {activeTab === 'call' && <CallFieldsContent event={event}/>}
             </div>
         </>
     )
@@ -166,14 +169,15 @@ const Form = ({formData, setFormData, activeTab}) => {
 
 
 const handleClickSave = async (event, formData) => {
-
     const data = {
-        start: moment(formData.startDate).format('MM/DD/YYYY') + ' ' + moment(formData.startTime).format('hh:mm A') + ' ' + moment(event.start).format('z'),
-        end: moment(formData.endDate).format('MM/DD/YYYY') + ' ' + moment(formData.endTime).format('hh:mm A') + ' ' + moment(event.start).format('z'),
+        start: moment.tz(formData.startDate.format('MM/DD/YYYY') + ' ' + formData.startTime.format('HH:mm'), 'MM/DD/YYYY HH:mm', formData.timezone).format(),
+        end: moment.tz(formData.endDate.format('MM/DD/YYYY') + ' ' + formData.endTime.format('HH:mm'), 'MM/DD/YYYY HH:mm', formData.timezone).format(),
         title: formData.title,
         guestsCanInviteOthers: formData.guestsCanInviteOthers,
         guestsCanModify: formData.guestsCanModify,
-        guestsCanSeeOtherGuests: formData.guestsCanSeeOtherGuests
+        guestsCanSeeOtherGuests: formData.guestsCanSeeOtherGuests,
+        attendees: formData.attendees,
+        attendeesOmitted: formData.attendeesOmitted
     }
 
     // Call api to save data and show error messages where necessary
@@ -187,8 +191,17 @@ const handleClickSave = async (event, formData) => {
 }
 
 const handleInputChange = (setFormData, formData, property, input) => {
-    let value = input instanceof moment ? input : input.target.value
-    value = input.target.type === 'checkbox' ? input.target.checked : input.target.value
+    let value
+    if(input instanceof moment) {
+        value = input
+    }
+    else if(input.target.type === 'checkbox') {
+        value = input.target.checked
+    }
+    else {
+        value = input.target.value
+    }
+
     setFormData(prev => ({
         ...prev,
         [property]: value
