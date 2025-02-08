@@ -207,9 +207,9 @@ class EventService
         // ** attendees
         // Attendees: see https://developers.google.com/calendar/api/v3/reference/events#:~:text=writable-,attendees%5B%5D,-list
         // attendees omitted - boolean - whether any of an event's attendees may have been excluded from the response when getting the event from Calendar API. This may be true if parameters such as maxAttendees is set to a lower number than the amount of attendees for that event (eg, the event has 100 attendees, but the maxAttendees parameter is set to 10, so only 10 attendees come back in the api response, meaning 90 of them were left out of the response)
-        // guests can invite others
-        // guests can modify
-        // guests can see other guests
+        // guests can invite others - DONE
+        // guests can modify - DONE
+        // guests can see other guests - DONE
         
         // birthday properties (If event type is 'birthday')
         // color id - Eventually allow user to update colors as well

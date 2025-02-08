@@ -21,6 +21,7 @@ import AttendeeFieldsContent, {AttendeeFieldsInputs} from "@/app/components/Even
 import EmailAutofill from "@/app/components/EmailAutofill";
 import CallFieldsContent from "@/app/components/Event/CallFields";
 import {formatDate} from "@fullcalendar/core";
+import SettingsFieldsContent, {SettingsFieldsInputs} from "@/app/components/Event/SettingsFields";
 
 library.add(faBell, faUsers, faPalette, faClock, faLocationDot, faGear, faPhone, faFont)
 
@@ -41,7 +42,8 @@ export default function PreviewEventModal ({hideModal, setHideModal, event}) {
         guestsCanModify: event.guestsCanModify,
         guestsCanSeeOtherGuests: event.guestsCanSeeOtherGuests,
         attendees: event.attendees,
-        attendeesOmitted: event.attendeesOmitted
+        attendeesOmitted: event.attendeesOmitted,
+        status: event.status
     })
     const [activeTab, setActiveTab] = useState(null)
 
@@ -135,12 +137,13 @@ const Content = ({event, activeTab, formData}) => {
                 {activeTab === 'dates' && <DateFieldsContent event={event} formData={formData}/>}
                 {activeTab === 'users' && <AttendeeFieldsContent event={event}/>}
                 {activeTab === 'call' && <CallFieldsContent event={event}/>}
+                {activeTab === 'settings' && <SettingsFieldsContent event={event}/>}
             </div>
         </>
     )
 }
 
-const Form = ({formData, setFormData, activeTab}) => {
+const Form = ({formData, setFormData, activeTab, event}) => {
     return (
         <>
             <form>
@@ -160,7 +163,12 @@ const Form = ({formData, setFormData, activeTab}) => {
                 <div className={"flex flex-col space-y-4"}>
                     {activeTab === 'users' &&
                         <AttendeeFieldsInputs handleInputChange={handleInputChange} setFormData={setFormData}
-                                          formData={formData}/>}
+                                              formData={formData}/>}
+                </div>
+                <div className={"flex flex-col space-y-4"}>
+                    {activeTab === 'settings' &&
+                        <SettingsFieldsInputs handleInputChange={handleInputChange} setFormData={setFormData}
+                                              formData={formData} event={event}/>}
                 </div>
             </form>
         </>
@@ -177,7 +185,8 @@ const handleClickSave = async (event, formData) => {
         guestsCanModify: formData.guestsCanModify,
         guestsCanSeeOtherGuests: formData.guestsCanSeeOtherGuests,
         attendees: formData.attendees,
-        attendeesOmitted: formData.attendeesOmitted
+        attendeesOmitted: formData.attendeesOmitted,
+        status: formData.status
     }
 
     // Call api to save data and show error messages where necessary

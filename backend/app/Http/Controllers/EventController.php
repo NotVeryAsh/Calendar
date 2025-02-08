@@ -24,7 +24,13 @@ class EventController extends Controller
                 "guestsCanSeeOtherGuests" => $event->getGuestsCanSeeOtherGuests(),
                 'hangoutLink' => $event->getHangoutLink(),
                 'htmlLink' => $event->getHtmlLink(),
-                'timezone' => $event->getStart()->getTimeZone()
+                'timezone' => $event->getStart()->getTimeZone(),
+                'status' => $event->getStatus(),
+                'statuses' => [
+                    'confirmed',
+                    'tentative',
+                    'cancelled',
+                ]
             ];
         });
 

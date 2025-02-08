@@ -39,6 +39,10 @@ class UpdateEventRequest extends FormRequest
                 'nullable',
                 'bool'
             ],
+            'status' => [
+                'required',
+                'in:confirmed,tentative,cancelled',
+            ]
         ];
     }
 }
