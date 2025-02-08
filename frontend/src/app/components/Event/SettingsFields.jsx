@@ -2,7 +2,7 @@ import {ucFirst} from "@/app/lib/string";
 import moment from "moment-timezone";
 export default function SettingsFieldsContent ({event, formData}) {
 
-    const lastUpdated = moment.tz(event?.start, formData.timezone)
+    const lastUpdated = moment.tz(event?.last_updated, formData.timezone)
     const format =  lastUpdated.year() !== moment().year() ? 'dddd, MMM Do, Y, hh:mm A' : 'dddd, MMM Do, hh:mm A'
 
     return (
