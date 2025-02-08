@@ -1,15 +1,19 @@
-import {useState} from "react";
-
 export default function AttendeeFieldsContent ({event}) {
-    
+      
     return (
         <>
+            <div className={"flex flex-col space-y-2"}>
+                <span className={"font-medium mt-4"}>Organizer</span>
+                <span>{event.organizer?.email + (event.organizer?.self ? ' (You)' : '')}</span>
+            </div>
+            <div className={"flex flex-col space-y-2"}>
             <span className={"font-medium mt-4"}>Guests can...</span>
-            <ul className={"list-disc px-4"}>
-                <li className={getConditions(event).canModify ? '' : 'line-through'}>Modify the event</li>
-                <li className={getConditions(event).inviteOthers ? '' : 'line-through'}>Invite others</li>
-                <li className={getConditions(event).seeOthers ? '' : 'line-through'}>See the guest list</li>
-            </ul>
+                <ul className={"list-disc px-4"}>
+                    <li className={getConditions(event).canModify ? '' : 'line-through'}>Modify the event</li>
+                    <li className={getConditions(event).inviteOthers ? '' : 'line-through'}>Invite others</li>
+                    <li className={getConditions(event).seeOthers ? '' : 'line-through'}>See the guest list</li>
+                </ul>
+            </div>
         </>
     );
 }

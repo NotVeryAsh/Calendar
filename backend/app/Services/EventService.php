@@ -219,7 +219,7 @@ class EventService
         // created (Read only)
         // creator (Read only)
         // description (Can contain HTML) (Check how we can safely validate and sanitize this)
-        // organizer (Read only except when importing an event)
+        // organizer (Read only except when importing an event) (DONE)
         
         // ** time        
         // original start time (immutable, for recurring events, this is the time that the event is supposed to take place - this value does not change, even if you change the time that the reccuring event takes place)
