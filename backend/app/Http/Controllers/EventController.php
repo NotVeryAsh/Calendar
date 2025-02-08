@@ -26,6 +26,7 @@ class EventController extends Controller
                 'htmlLink' => $event->getHtmlLink(),
                 'timezone' => $event->getStart()->getTimeZone(),
                 'status' => $event->getStatus(),
+                'last_updated' => $event->getUpdated(),
                 'statuses' => [
                     'confirmed',
                     'tentative',

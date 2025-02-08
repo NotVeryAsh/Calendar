@@ -2,15 +2,20 @@ import {DatePicker, DesktopTimePicker, LocalizationProvider} from "@mui/x-date-p
 import {AdapterMoment} from "@mui/x-date-pickers/AdapterMoment";
 import {DemoContainer} from "@mui/x-date-pickers/internals/demo";
 import moment from "moment-timezone";
-import {alignProperty} from "@mui/material/styles/cssUtils";
 
 export default function DateFieldsContent ({event, formData}) {
 
     const startDate = moment.tz(event?.start, formData.timezone)
     const endDate = moment.tz(event?.end, formData.timezone)
 
-    const startDay = startDate.format('dddd, MMM Do')
-    const endDay = endDate.format('dddd, MMM Do')
+    const year = moment().year()
+    
+    const format = 'dddd, MMM Do'
+    const startDayFormat = startDate.year() === year ? format : format + ', Y'
+    const endDayFormat = endDate.year() === year ? format : format + ', Y'
+    
+    const startDay = startDate.format(startDayFormat)
+    const endDay = endDate.format(endDayFormat)
     
     return (
         <>

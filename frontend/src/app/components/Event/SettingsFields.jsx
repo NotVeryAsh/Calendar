@@ -1,6 +1,10 @@
 import {ucFirst} from "@/app/lib/string";
-export default function SettingsFieldsContent ({event}) {
-    
+import moment from "moment-timezone";
+export default function SettingsFieldsContent ({event, formData}) {
+
+    const lastUpdated = moment.tz(event?.start, formData.timezone)
+    const format =  lastUpdated.year() !== moment().year() ? 'dddd, MMM Do, Y, hh:mm A' : 'dddd, MMM Do, hh:mm A'
+
     return (
         <>
             <div className={"flex flex-col space-y-2"}>
@@ -9,11 +13,17 @@ export default function SettingsFieldsContent ({event}) {
                     {ucFirst(event.status)}
                 </span>
             </div>
+            <div className={"flex flex-col space-y-2"}>
+                <span className={"font-medium"}>Last Updated</span>
+                <span>
+                    {lastUpdated.format(format)}
+                </span>
+            </div>
         </>
     );
 }
 
-export const SettingsFieldsInputs = ({event, formData, setFormData}) => {    
+export const SettingsFieldsInputs = ({event, formData, setFormData}) => {
     return (
         <>
             <div className={"flex flex-col space-y-3"}>

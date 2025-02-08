@@ -226,7 +226,7 @@ class EventService
         
         // ** call        
         // Hangout link (read only) DONE
-        // HTML link (read only)
+        // HTML link (read only) DONE
         
         // Event type (cannot be edited after event created. See values: https://developers.google.com/calendar/api/v3/reference/events#:~:text=of%20the%20resource.-,eventType,-string)
         // set kind (api docs do not specify that it is writable. Its value is calendar#event)
@@ -246,7 +246,7 @@ class EventService
         
         // ** settings / meta?
         // status - status of the event - 'confirmed', 'tentative', 'cancelled': see https://developers.google.com/calendar/api/v3/reference/events#:~:text=writable-,status,-string
-        // updated - a timestamp of the last time the event was updated
+        // updated - a timestamp of the last time the event was updated DONE
         // set id (writable, but with restrictions: see https://developers.google.com/calendar/api/v3/reference/events#:~:text=events.get%20method.-,id,-string)
         // etag - a string attached to objects which is changed anytime the resource is changed (eg. if we updated an event, the etag is changed) etags are used to check if a resource has been modified since a new etag is generated when the resource is modified
 

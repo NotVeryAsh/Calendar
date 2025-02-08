@@ -137,7 +137,7 @@ const Content = ({event, activeTab, formData}) => {
                 {activeTab === 'dates' && <DateFieldsContent event={event} formData={formData}/>}
                 {activeTab === 'users' && <AttendeeFieldsContent event={event}/>}
                 {activeTab === 'call' && <CallFieldsContent event={event}/>}
-                {activeTab === 'settings' && <SettingsFieldsContent event={event}/>}
+                {activeTab === 'settings' && <SettingsFieldsContent event={event} formData={formData}/>}
             </div>
         </>
     )
@@ -197,6 +197,7 @@ const handleClickSave = async (event, formData) => {
     }
 
     const json = await response.json();
+    // Show success message     
 }
 
 const handleInputChange = (setFormData, formData, property, input) => {
