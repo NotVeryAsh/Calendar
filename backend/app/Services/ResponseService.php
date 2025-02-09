@@ -3,28 +3,21 @@
 namespace App\Services;
 
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Response;
+use JetBrains\PhpStorm\NoReturn;
 
 class ResponseService
 {
-    public function success($data = [], $code = 200): JsonResponse
-    {
-        return response()->json($data, $code);
-    }
-
-    public function error($data = [], $code = 400, $message = ''): JsonResponse
-    {
-        return response()->json([
-            'message' => $message,
-            ...$data
-        ], $code);
-    }
-    
-    public function respond($data = [], $code = 200, $message = ''): JsonResponse
-    {
-        if($code > 200 && $code < 300){
-            return $this->success($data, $code);
+    #[NoReturn]
+    /**
+     * Send a response back to the browser
+     */
+    public function respond($data = [], $code = 200, $message = 'Something went wrong. Please try again later.'): JsonResponse
+    {        
+        if($code > 399){
+            $data['message'] = $message;
         }
-        
-        return $this->error($data, $code, $message);
+                
+         return response()->json($data, $code);
     }
 }

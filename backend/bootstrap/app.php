@@ -15,5 +15,8 @@ return Application::configure(basePath: dirname(__DIR__))
         //
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
+        $exceptions->render(function (Exception $e) {
+            Log::error($e);
+            return \App\Facades\Response::respond([], $e->getCode(), 'Something went wrong. Please try again later.');
+        });
     })->create();

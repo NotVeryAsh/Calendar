@@ -8,6 +8,8 @@ use Exception;
 use Google\Service\Calendar;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 class AuthService
 {    
@@ -29,22 +31,22 @@ class AuthService
 
         return $client->createAuthUrl();
     }
-    
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws Exception
+     */
     public function getAccessToken(): JsonResponse|array
     {
         // TODO How to track this so user stays logged in?
         // Is it safe to store an oauth token on the frontend in cookies or local storage etc?
         $client = Event::initialize();
-        try {
-            $token = $client->fetchAccessTokenWithAuthCode(request()->get('code'));
-        } catch (Exception $e) {
-            Log::error($e->getMessage());
-            return Response::respond([], 400, 'Something went wrong. Please try again later.');
-        }
+        $token = $client->fetchAccessTokenWithAuthCode(request()->get('code'));
 
         if(isset($token['error'])) {
             Log::error(json_encode($token));
-            return Response::respond([], 400, 'Something went wrong. Please try again later.');
+            throw new Exception($token['error']);
         }
         
         return $token;

@@ -3,15 +3,13 @@
 namespace App\Services;
 
 use App\Facades\Event;
-use App\Facades\Response;
+use DateMalformedStringException;
 use DateTime;
 use DateTimeInterface;
-use Exception;
 use Google\Client;
+use Google\Exception;
 use Google\Service\Calendar;
 use Google_Service_Calendar_EventDateTime;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Log;
 use Google\Service\Calendar\Event as GoogleEvent;
 use Google\Service\Calendar\Events;
 
@@ -23,7 +21,7 @@ class EventService
     /**
      * An array of date fields so we know which fields to parse into Google's DateTime objects
      */
-    private const DATE_FIELDS = [
+    private const array DATE_FIELDS = [
         'start',
         'end'
     ];
@@ -31,51 +29,43 @@ class EventService
     /**
      * An array of generic property names and the Google Event property they map to
      */
-    private const MAP_DATA = [
+    private const array MAP_DATA = [
         'title' => 'summary'
     ];
 
     /**
      * Fields that have to be set first - other fields may depend on the value of these fields
      */
-    private const PRIORITY_FIELDS = [
+    private const array PRIORITY_FIELDS = [
         'guestsCanModify'
     ];
 
     /**
      * Create the client and set the config credentials to authorize with the API
-     * 
-     * @return Client|JsonResponse
+     *
+     * @return Client
+     * @throws Exception
      */
-    public function initialize(): Client|JsonResponse
+    public function initialize(): Client
     {
         if(!isset($this->client)) {
             $this->client = new Client();   
         }
 
-        try {
-            $this->client->setAuthConfig(base_path('client-secret.json'));
-            return $this->client;
-        } catch (Exception $e) {
-            Log::error($e->getMessage());
-            return Response::respond([], 400, 'Something went wrong. Please try again later.');
-        }
+        $this->client->setAuthConfig(base_path('client-secret.json'));
+        return $this->client;
     }
 
     /**
      * Authenticate with Google's API
-     * 
-     * @return JsonResponse|$this
+     *
+     * @return static $this
+     * @throws Exception
      */
-    private function authenticate(): static|JsonResponse
+    private function authenticate(): static
     {
         $this->initialize();
-        try {
-            $this->client->setAccessToken(request()->header('Authorization'));
-        } catch (Exception $e) {
-            Log::error($e->getMessage());
-            return Response::respond([], 400, 'Something went wrong. Please try again later.');
-        }
+        $this->client->setAccessToken(request()->header('Authorization'));
         
         return $this;
     }
@@ -96,52 +86,45 @@ class EventService
 
     /**
      * Get a specific event for a calendar
-     * 
+     *
      * @param $calendarId
      * @param $eventId
-     * @return GoogleEvent|JsonResponse
+     * @return GoogleEvent
+     * @throws \Google\Service\Exception|Exception
      */
-    public function getEvent($calendarId, $eventId): GoogleEvent|JsonResponse
+    public function getEvent($calendarId, $eventId): GoogleEvent
     {
-        $this->authenticate();    
-        try {
-            return $this->getCalendarService()->events->get($calendarId, $eventId);
-        } catch (Exception $e) {
-            Log::error($e->getMessage());
-            return Response::respond([], 400, 'Something went wrong. Please try again later.');
-        }
+        $this->authenticate();
+        return $this->getCalendarService()->events->get($calendarId, $eventId);
     }
 
     /**
      * Get a ist of events for a calendar
-     * 
+     *
      * @param $calendarId
-     * @return Events|JsonResponse
+     * @return Events
+     * @throws \Google\Service\Exception|Exception
      */
-    public function getEvents($calendarId): Events|JsonResponse
+    public function getEvents($calendarId): Events
     {
         $this->authenticate();
-        try {
-            \Log::info(json_encode($this->getCalendarService()->events->listEvents($calendarId)));
-            return $this->getCalendarService()->events->listEvents($calendarId);
-            
-        } catch (Exception $e) {
-            Log::error($e->getMessage());
-            return Response::respond([], 400, 'Something went wrong. Please try again later.');
-        }
+        return $this->getCalendarService()->events->listEvents($calendarId);
     }
 
     /**
      * Update an event with the given data
-     * 
+     *
      * @param $calendarId
      * @param $eventId
      * @param $data
      * @param array $optParams
-     * 
-     * @return GoogleEvent|JsonResponse
+     *
+     * @return GoogleEvent
+     * @throws \Google\Service\Exception
+     * @throws DateMalformedStringException
+     * @throws Exception
      */
-    public function updateEvent($calendarId, $eventId, $data, array $optParams = []): GoogleEvent|JsonResponse
+    public function updateEvent($calendarId, $eventId, $data, array $optParams = []): GoogleEvent
     {
         $this->authenticate();
     
@@ -149,12 +132,8 @@ class EventService
 
         $event = Event::getEvent("primary", $eventId);
         $event = $this->setEventData($event, $data);
-        try {
-            return $this->getCalendarService()->events->update($calendarId, $eventId, $event, $optParams);
-        } catch (Exception $e) {
-            Log::error($e->getMessage());
-            return Response::respond([], 400, 'Something went wrong. Please try again later.');
-        }
+        
+        return $this->getCalendarService()->events->update($calendarId, $eventId, $event, $optParams);
     }
 
     /**
@@ -188,11 +167,12 @@ class EventService
 
     /**
      * Set the data on the event object so we can pass it to Google to update
-     * 
+     *
      * @param GoogleEvent $event
      * @param $data
-     * 
+     *
      * @return GoogleEvent
+     * @throws DateMalformedStringException
      */
     private function setEventData(GoogleEvent $event, $data): GoogleEvent
     {
@@ -288,18 +268,14 @@ class EventService
 
     /**
      * Format the date so it is compatible with Google's API
-     * 
+     *
      * @param $date
-     * @return Google_Service_Calendar_EventDateTime|JsonResponse
+     * @return Google_Service_Calendar_EventDateTime
+     * @throws DateMalformedStringException
      */
-    private function formatDate($date): Google_Service_Calendar_EventDateTime|JsonResponse
+    private function formatDate($date): Google_Service_Calendar_EventDateTime
     {
-        try {
-            $dateTime = new DateTime($date);
-        } catch (Exception $e) {
-            Log::error($e->getMessage());
-            return Response::respond([], 400, 'Something went wrong. Please try again later.');
-        }
+        $dateTime = new DateTime($date);
         $calendarDateTime = new Google_Service_Calendar_EventDateTime();
         $calendarDateTime->setDateTime($dateTime->format(DateTimeInterface::RFC3339));
         
