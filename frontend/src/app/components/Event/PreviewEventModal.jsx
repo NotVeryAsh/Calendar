@@ -22,6 +22,7 @@ import EmailAutofill from "@/app/components/EmailAutofill";
 import CallFieldsContent from "@/app/components/Event/CallFields";
 import {formatDate} from "@fullcalendar/core";
 import SettingsFieldsContent, {SettingsFieldsInputs} from "@/app/components/Event/SettingsFields";
+import ColorFieldsContent, {ColorFieldsInput} from "@/app/components/Event/ColorFields";
 
 library.add(faBell, faUsers, faPalette, faClock, faLocationDot, faGear, faPhone, faFont)
 
@@ -138,6 +139,7 @@ const Content = ({event, activeTab, formData}) => {
                 {activeTab === 'users' && <AttendeeFieldsContent event={event}/>}
                 {activeTab === 'call' && <CallFieldsContent event={event}/>}
                 {activeTab === 'settings' && <SettingsFieldsContent event={event} formData={formData}/>}
+                {activeTab === 'colors' && <ColorFieldsContent event={event} formData={formData}/>}
             </div>
         </>
     )
@@ -168,6 +170,11 @@ const Form = ({formData, setFormData, activeTab, event}) => {
                 <div className={"flex flex-col space-y-4"}>
                     {activeTab === 'settings' &&
                         <SettingsFieldsInputs handleInputChange={handleInputChange} setFormData={setFormData}
+                                              formData={formData} event={event}/>}
+                </div>
+                <div className={"flex flex-col space-y-4"}>
+                    {activeTab === 'colors' &&
+                        <ColorFieldsInput handleInputChange={handleInputChange} setFormData={setFormData}
                                               formData={formData} event={event}/>}
                 </div>
             </form>

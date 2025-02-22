@@ -40,7 +40,9 @@ class EventController extends Controller
                     'confirmed',
                     'tentative',
                     'cancelled',
-                ]
+                ],
+                'colors' => Event::getCalendarService()->colors,
+                'colorId' => $event->getColorId()
             ];
         });
 
