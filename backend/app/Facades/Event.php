@@ -15,6 +15,7 @@ use Google\Service\Calendar;
  * @method static GoogleEvent|JsonResponse getEvent($calendarId, $eventId)
  * @method static Events|JsonResponse getEvents($calendarId)
  * @method static GoogleEvent|JsonResponse updateEvent($calendarId, $eventId, $data, array $optParams = [])
+ * @method static array asResource(GoogleEvent $event)
  * 
  * @see EventService
  */

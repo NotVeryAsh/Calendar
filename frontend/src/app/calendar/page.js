@@ -4,6 +4,8 @@ import dayGridPlugin from '@fullcalendar/daygrid'
 import sendRequest from "@/app/lib/request";
 import {useEffect, useState} from "react";
 import PreviewEventModal from "@/app/components/Event/PreviewEventModal";
+import Popup from "@/app/components/Event/Popup";
+import {clearSession} from "@/app/lib/session";
 
 export default function Calendar() {
 
@@ -17,10 +19,16 @@ export default function Calendar() {
     const [selectedEvent, setSelectedEvent] = useState(undefined)
     const [hideModal, setHideModal] = useState(true)
 
+    const [message, setMessage] = useState({
+        message: undefined,
+        type: 'success'
+    });
+    
     return (
         <>
+            <Popup message={message?.message} type={message?.type} setMessage={setMessage} />
             {selectedEvent &&
-                <PreviewEventModal hideModal={hideModal} setHideModal={setHideModal} event={selectedEvent}/>
+                <PreviewEventModal hideModal={hideModal} setHideModal={setHideModal} event={selectedEvent} setEvent={setSelectedEvent} setMessage={setMessage}/>
             }
             <FullCalendar
                 plugins={[

@@ -155,7 +155,7 @@ const getTimezones = () => {
         let name = timezoneNames[i]
 
         timezones.push({
-            label: `(GMT${moment.tz(name).format('Z')}) ` + name,
+            label: `(GMT${moment.tz(name).format('Z')}) ` + name.replace(/_/g, " "),
             timezone: name
         });
     }

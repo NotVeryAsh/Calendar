@@ -18,15 +18,14 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import DateFieldsContent, {DateFieldsInputs} from "@/app/components/Event/DateFields";
 import AttendeeFieldsContent, {AttendeeFieldsInputs} from "@/app/components/Event/AttendeeFields";
-import EmailAutofill from "@/app/components/EmailAutofill";
 import CallFieldsContent from "@/app/components/Event/CallFields";
-import {formatDate} from "@fullcalendar/core";
 import SettingsFieldsContent, {SettingsFieldsInputs} from "@/app/components/Event/SettingsFields";
-import ColorFieldsContent, {ColorFieldsInput} from "@/app/components/Event/ColorFields";
+import ColorFieldsContent, {ColorFieldsInputs} from "@/app/components/Event/ColorFields";
+import NotificationFieldsContent, {NotificationFieldsInputs} from "@/app/components/Event/NotificationFields";
 
 library.add(faBell, faUsers, faPalette, faClock, faLocationDot, faGear, faPhone, faFont)
 
-export default function PreviewEventModal ({hideModal, setHideModal, event}) {
+export default function PreviewEventModal ({hideModal, setHideModal, event, setEvent, setMessage}) {
 
     const [editMode, setEditMode] = useState(false)
     const [formData, setFormData] = useState({
@@ -114,7 +113,7 @@ export default function PreviewEventModal ({hideModal, setHideModal, event}) {
             <Modal.Footer setHideModal={setHideModal}>
                 {editMode ? (
                     <>
-                        <SuccessButton onClick={() => handleClickSave(event, formData)}>Save</SuccessButton>
+                        <SuccessButton onClick={() => handleClickSave(event, formData, setEvent, setMessage)}>Save</SuccessButton>
                         <Button onClick={() => setEditMode(false)}>Cancel</Button>
                     </>
                 ) : (
@@ -140,6 +139,7 @@ const Content = ({event, activeTab, formData}) => {
                 {activeTab === 'call' && <CallFieldsContent event={event}/>}
                 {activeTab === 'settings' && <SettingsFieldsContent event={event} formData={formData}/>}
                 {activeTab === 'colors' && <ColorFieldsContent event={event} formData={formData}/>}
+                {activeTab === 'notifications' && <NotificationFieldsContent event={event} formData={formData}/>}
             </div>
         </>
     )
@@ -174,8 +174,13 @@ const Form = ({formData, setFormData, activeTab, event}) => {
                 </div>
                 <div className={"flex flex-col space-y-4"}>
                     {activeTab === 'colors' &&
-                        <ColorFieldsInput handleInputChange={handleInputChange} setFormData={setFormData}
-                                              formData={formData} event={event}/>}
+                        <ColorFieldsInputs handleInputChange={handleInputChange} setFormData={setFormData}
+                                           formData={formData} event={event}/>}
+                </div>
+                <div className={"flex flex-col space-y-4"}>
+                    {activeTab === 'notifications' &&
+                        <NotificationFieldsInputs handleInputChange={handleInputChange} setFormData={setFormData}
+                                           formData={formData} event={event}/>}
                 </div>
             </form>
         </>
@@ -183,7 +188,7 @@ const Form = ({formData, setFormData, activeTab, event}) => {
 }
 
 
-const handleClickSave = async (event, formData) => {
+const handleClickSave = async (event, formData, setEvent, setMessage) => {
     const data = {
         start: moment.tz(formData.startDate.format('MM/DD/YYYY') + ' ' + formData.startTime.format('HH:mm'), 'MM/DD/YYYY HH:mm', formData.timezone).format(),
         end: moment.tz(formData.endDate.format('MM/DD/YYYY') + ' ' + formData.endTime.format('HH:mm'), 'MM/DD/YYYY HH:mm', formData.timezone).format(),
@@ -200,11 +205,22 @@ const handleClickSave = async (event, formData) => {
     const response = await sendRequest(`/api/event/${event.id}`, "PUT", data);
 
     if (response.status !== 200) {
-        throw new Error('Failed to update event');
+        setMessage({
+            message: 'Something went wrong. Please try again later.',
+            type: 'error'
+        })
+        
+        return
     }
 
     const json = await response.json();
-    // Show success message     
+
+    setMessage({
+        message: 'Successfully updated the event!',
+        type: 'success'
+    })
+    
+    setEvent(json.event)
 }
 
 const handleInputChange = (setFormData, formData, property, input) => {

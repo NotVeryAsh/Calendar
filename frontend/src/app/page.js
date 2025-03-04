@@ -35,7 +35,7 @@ export default function Home() {
     return (
         <div className={"flex flex-col p-2 h-screen justify-between py-20"}>
             <h1 className={"text-center font-semibold text-5xl text-sky-700"}>Calendar</h1>
-            <Popup message={errorMessage} />
+            <Popup message={errorMessage} setMessage={setErrorMessage} />
             {/* TODO If endpoint fails, un-disable button */}
             <button 
                 onClick={() => {onClickGoogleLogin(setErrorMessage); setLoginButtonDisabled(true)}}

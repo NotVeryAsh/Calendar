@@ -183,6 +183,11 @@ class EventService
         // ** recurrence
         // recurrence, see: https://developers.google.com/calendar/api/v3/reference/events#:~:text=default%20is%20False.-,recurrence%5B%5D,-list
         // Recurring event id - the event that each recurrence is imitating / belongs to / the original it is copying (immutable)
+        //     "recurrence": [
+        //         "RRULE:FREQ=WEEKLY;WKST=SU;BYDAY=TU"
+        //     ],
+        // https://icalendar.org/iCalendar-RFC-5545/3-8-5-3-recurrence-rule.html
+        
         
         // ** attendees
         // Attendees: see https://developers.google.com/calendar/api/v3/reference/events#:~:text=writable-,attendees%5B%5D,-list
@@ -192,7 +197,7 @@ class EventService
         // guests can see other guests - DONE
         
         // birthday properties (If event type is 'birthday')
-        // color id - Eventually allow user to update colors as well
+        // color id - Eventually allow user to update colors as well - WIP
         // conference data: see https://developers.google.com/calendar/api/v3/reference/events#:~:text=writable-,conferenceData,-nested%20object
         
         // ** creator        
@@ -280,5 +285,46 @@ class EventService
         $calendarDateTime->setDateTime($dateTime->format(DateTimeInterface::RFC3339));
         
         return $calendarDateTime;
+    }
+
+    /**
+     * Get the event as a resource array.
+     * 
+     * @param GoogleEvent $event
+     * @return array
+     */
+    public function asResource(GoogleEvent $event): array
+    {
+        $organizer = $event->getOrganizer();
+
+        // TODO Add all relevant properties eg. calendar color, link, other people invited etc.
+        // TODO Allow user to choose custom color for event - or preset from google's colors
+        // TODO Eventually, if this endpoint is kinda slow, we can split it up into categories -> only return data for that category
+        return [
+            "id" => $event->id,
+            "title" => $event->summary,
+            "start" => $event->getStart()->dateTime,
+            "end" => $event->getEnd()->dateTime,
+            "guestsCanModify" => $event->getGuestsCanModify(),
+            "guestsCanInviteOthers" => $event->getGuestsCanInviteOthers(),
+            "guestsCanSeeOtherGuests" => $event->getGuestsCanSeeOtherGuests(),
+            'hangoutLink' => $event->getHangoutLink(),
+            'htmlLink' => $event->getHtmlLink(),
+            'timezone' => $event->getStart()->getTimeZone(),
+            'status' => $event->getStatus(),
+            'last_updated' => $event->getUpdated(),
+            'organizer' => [
+                'displayName' => $organizer->getDisplayName(),
+                'email' => $organizer->getEmail(),
+                'self' => $organizer->getSelf(),
+            ],
+            'statuses' => [
+                'confirmed',
+                'tentative',
+                'cancelled',
+            ],
+            'colors' => Event::getCalendarService()->colors,
+            'colorId' => $event->getColorId()
+        ];
     }
 }
