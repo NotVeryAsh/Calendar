@@ -10,7 +10,7 @@ export default function Popup({message=null, type='error', setMessage}) {
         }
         
         setHidden(false)
-        setTimeout(() => {setHidden(true); setMessage(null)}, 3000);
+        setTimeout(() => {setHidden(true); setMessage(null)}, 2000);
         
     }, [message]);
 
@@ -25,7 +25,7 @@ export default function Popup({message=null, type='error', setMessage}) {
                 <span className={"flex m-auto"}>
                     {message ? message : ''}
                 </span>
-                <div className={`overflow-hidden rounded-lg rounded-tl-none h-2 ${types[type]} transition-[width] ease-linear duration-[3s] ` + (hidden ? 'w-[0%]' : 'w-[100%]')}></div>
+                <div className={`overflow-hidden rounded-lg rounded-tl-none h-2 ${types[type]} transition-[width] ease-linear duration-[2s] ` + (hidden ? 'w-[0%]' : 'w-[100%]')}></div>
             </div>   
         </div>
     )

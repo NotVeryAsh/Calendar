@@ -19,6 +19,28 @@ export default function EmailAutofill()
     ]
     
     const [suggestedEmails, setSuggestedEmails] = useState([])
+
+    const handleChange = (event) => {
+        let input = event.target.value
+
+        if(!input.includes('@') || input.length <= 1) {
+            setSuggestedEmails([])
+            return;
+        }
+
+        // TODO Eventually, if comma entered, submit the email address if it is valid
+        // TODO Also submit email address on press enter key or select email from dropdown
+        // TODO When email from dropdown is clicked, replace all chars after @ symbol with selected email extension
+        // TODO Eventually, allow user to navigate with arrow keys on dropdown to select a value, and press enter to select
+        
+        const domain = input.substring(input.indexOf("@") + 1)
+
+        setSuggestedEmails(() => {
+            return emails.filter((email) => {
+                return email.startsWith(domain)
+            })
+        })
+    }
     
     return (
         <div className={"flex flex-col relative"}>
@@ -32,26 +54,4 @@ export default function EmailAutofill()
             </div>
         </div>
     )
-}
-
-const handleChange = (event, setSuggestedEmails, emails) => {
-    let input = event.target.value
-    
-    if(!input.includes('@') || input.length <= 1) {
-        setSuggestedEmails([])
-        return;
-    }
-    
-    // TODO Eventually, if comma entered, submit the email address if it is valid
-    // TODO Also submit email address on press enter key or select email from dropdown
-    // TODO When email from dropdown is clicked, replace all chars after @ symbol with selected email extension
-    // TODO Eventually, allow user to navigate with arrow keys on dropdown to select a value, and press enter to select
-    
-    input = input.substring(input.indexOf("@") + 1)
-    
-    setSuggestedEmails(() => {
-        return emails.filter((email) => {
-            return email.startsWith(input)
-        })
-    })
 }

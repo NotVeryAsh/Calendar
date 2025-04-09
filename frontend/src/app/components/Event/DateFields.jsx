@@ -30,11 +30,99 @@ export default function DateFieldsContent ({event, formData}) {
 }
 
 export const DateFieldsInputs = ({handleInputChange, setFormData, formData}) => {
+
+    const handleSelectTimezone = (e) => {
+        const timezone = e.target.value
+        setFormData(prev => ({
+            ...prev,
+            ...{
+                timezone: timezone,
+                startDate: moment.tz(formData.startDate.format(), timezone),
+                originalStartTime: moment.tz(formData.originalStartTime.format(), timezone),
+                startTime: moment.tz(formData.startTime.format(), timezone),
+                endDate: moment.tz(formData.endDate.format(), timezone),
+                originalEndTime: moment.tz(formData.originalEndTime.format(), timezone),
+                endTime: moment.tz(formData.endTime.format(), timezone),
+            }
+        }));
+    }
+
+    const handleAllDayChecked = (event) => {
+        const startTime = event.target.checked ? formData.startDate.startOf('day') : formData.originalStartTime;
+        const endTime = event.target.checked ? formData.endDate.endOf('day') : formData.originalEndTime;
+
+        setFormData(prev => ({
+            ...prev,
+            ...{
+                startTime: startTime,
+                endTime: endTime
+            }
+        }));
+    }
+
+    const getTimezones = () => {
+        const timezoneNames = moment.tz.names()
+            .filter((timezone) => timezone.includes('/') && !timezone.includes('Etc'))
+            .sort((a, b) => moment.tz(a).utcOffset() - moment.tz(b).utcOffset())
+
+        let timezones = []
+
+        for(let i in timezoneNames)
+        {
+            let name = timezoneNames[i]
+
+            timezones.push({
+                label: `(GMT${moment.tz(name).format('Z')}) ` + name.replace(/_/g, " "),
+                timezone: name
+            });
+        }
+
+        return timezones
+    }
+    
+    const handleChangeTime = (value, start = false) => {
+        const timezone = formData.timezone
+        let property
+        if(start) {
+            property = 'originalStartTime'
+        } else {
+            property = 'originalEndTime'
+        }
+
+        setFormData(prev => ({
+            ...prev,
+            ...{
+                [property]: moment.tz(value, timezone)
+            }
+        }));
+    }
+    
+    const getInputStyle = () => {
+        return {
+            "& .MuiOutlinedInput-root": {
+                borderRadius: "0.25rem !important",
+                fontFamily: "Montserrat, Montserrat Fallback;"
+            },
+            "& .MuiOutlinedInput-input" : {
+                padding: "0.8rem",
+            },
+            '& .MuiStack-root': {
+                paddingTop: '0 !important',
+            },
+            '& .MuiOutlinedInput-notchedOutline': {
+                border: '1px solid rgb(156 163 175) !important'
+            },
+            '& .MuiInputAdornment-root': {
+                display: 'none !important'
+            }
+        };
+    }
+    
     return (
         <>
             <div className={"flex flex-row !mt-4 space-x-2"}>
                 <input id={"all-day"} type={"checkbox"}
-                       onChange={e => {handleAllDayChecked(formData, setFormData, e); handleInputChange(setFormData, formData, 'allDay', e)}}/>
+                       onChange={e => {handleAllDayChecked(e); handleInputChange('allDay', e)}}/>
                 <label htmlFor={"all-day"}>All Day</label>
             </div>
             <LocalizationProvider dateAdapter={AdapterMoment}>
@@ -45,14 +133,14 @@ export const DateFieldsInputs = ({handleInputChange, setFormData, formData}) => 
                             label="Start Date"
                             className={formData.allDay === true ? '!w-full' : ''}
                             value={moment.tz(formData.startDate, formData.timezone)}
-                            onChange={e => handleInputChange(setFormData, formData, 'startDate', e)}
+                            onChange={e => handleInputChange('startDate', e)}
                             sx={getInputStyle()}
                         />
                         <DesktopTimePicker
                             className={formData.allDay === true ? '!hidden' : ''}
                             label="Start Time"
                             value={moment.tz(formData.startTime, formData.timezone)}
-                            onChange={e => {handleInputChange(setFormData, formData, 'startTime', e); handleChangeTime(e, formData, setFormData, true)}}
+                            onChange={e => {handleInputChange('startTime', e); handleChangeTime(e, true)}}
                             sx={getInputStyle()}
                         />
                     </div>
@@ -67,14 +155,14 @@ export const DateFieldsInputs = ({handleInputChange, setFormData, formData}) => 
                             label="End Date"
                             className={formData.allDay === true ? '!w-full' : ''}
                             value={moment.tz(formData.endDate, formData.timezone)}
-                            onChange={e => handleInputChange(setFormData, formData, 'endDate', e)}
+                            onChange={e => handleInputChange('endDate', e)}
                             sx={getInputStyle()}
                         />
                         <DesktopTimePicker
                             className={formData.allDay === true ? '!hidden' : ''}
                             label="End Time"
                             value={moment.tz(formData.endTime, formData.timezone)}
-                            onChange={e => {handleInputChange(setFormData, formData, 'endTime', e); handleChangeTime(e, formData, setFormData, false)}}
+                            onChange={e => {handleInputChange('endTime', e); handleChangeTime(e, false)}}
                             sx={getInputStyle()}
                         />
                     </div>
@@ -83,7 +171,7 @@ export const DateFieldsInputs = ({handleInputChange, setFormData, formData}) => 
             <div className={"flex flex-col space-y-3"}>
                 <span className={" font-medium"}>Timezone</span>
                 <div className={"flex flex-col"}>
-                    <select onChange={(e) => {handleSelectTimezone(e, setFormData, formData)}}
+                    <select onChange={(e) => {handleSelectTimezone(e)}}
                         className={"text-center p-2 border border-1 border-gray-400 rounded"} defaultValue={formData.timezone}>
                         {getTimezones().map((timezone => (
                             <option key={timezone.timezone} value={timezone.timezone}>
@@ -95,91 +183,4 @@ export const DateFieldsInputs = ({handleInputChange, setFormData, formData}) => 
             </div>
         </>
     )
-}
-
-const handleChangeTime = (value, formData, setFormData, start = false) => {
-    const timezone = formData.timezone
-    let property
-    if(start) {
-        property = 'originalStartTime' 
-    } else {
-        property = 'originalEndTime'
-    }
-
-    setFormData(prev => ({
-        ...prev,
-        ...{
-            [property]: moment.tz(value, timezone)
-        }
-    }));
-}
-
-const handleSelectTimezone = (e, setFormData, formData) => {
-    const timezone = e.target.value
-    setFormData(prev => ({
-        ...prev,
-        ...{
-            timezone: timezone,
-            startDate: moment.tz(formData.startDate.format(), timezone),
-            originalStartTime: moment.tz(formData.originalStartTime.format(), timezone),
-            startTime: moment.tz(formData.startTime.format(), timezone),
-            endDate: moment.tz(formData.endDate.format(), timezone),
-            originalEndTime: moment.tz(formData.originalEndTime.format(), timezone),
-            endTime: moment.tz(formData.endTime.format(), timezone),
-        }
-    }));
-}
-
-const handleAllDayChecked = (formData, setFormData, event) => {
-    const startTime = event.target.checked ? formData.startDate.startOf('day') : formData.originalStartTime;
-    const endTime = event.target.checked ? formData.endDate.endOf('day') : formData.originalEndTime;
-    
-    setFormData(prev => ({
-        ...prev,
-        ...{
-            startTime: startTime,
-            endTime: endTime
-        }
-    }));
-}
-
-const getTimezones = () => {
-    const timezoneNames = moment.tz.names()
-        .filter((timezone) => timezone.includes('/') && !timezone.includes('Etc'))
-        .sort((a, b) => moment.tz(a).utcOffset() - moment.tz(b).utcOffset())
-
-    let timezones = []
-
-    for(let i in timezoneNames)
-    {
-        let name = timezoneNames[i]
-
-        timezones.push({
-            label: `(GMT${moment.tz(name).format('Z')}) ` + name.replace(/_/g, " "),
-            timezone: name
-        });
-    }
-
-    return timezones
-}
-
-const getInputStyle = () => {
-    return {
-        "& .MuiOutlinedInput-root": {
-            borderRadius: "0.25rem !important",
-            fontFamily: "Montserrat, Montserrat Fallback;"
-        },
-        "& .MuiOutlinedInput-input" : {
-            padding: "0.8rem",
-        },
-        '& .MuiStack-root': {
-            paddingTop: '0 !important',
-        },
-        '& .MuiOutlinedInput-notchedOutline': {
-            border: '1px solid rgb(156 163 175) !important'
-        },
-        '& .MuiInputAdornment-root': {
-            display: 'none !important'
-        }
-    };
 }

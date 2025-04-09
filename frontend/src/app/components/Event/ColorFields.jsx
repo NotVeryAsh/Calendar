@@ -10,7 +10,11 @@ export default function ColorFieldsContent ({event}) {
     );
 }
 
-export const ColorFieldsInputs = ({handleInputChange, setFormData, formData}) => {    
+export const ColorFieldsInputs = ({handleInputChange, setFormData, formData}) => {
+    const handleColorSelected = (event) => {
+
+    }
+    
     return (
         <div className={"flex flex-col space-y-3"}>
             <span className={"font-medium"}>Color</span>
@@ -26,8 +30,4 @@ export const ColorFieldsInputs = ({handleInputChange, setFormData, formData}) =>
             </div>
         </div>
     )
-}
-
-const handleColorSelected = (event) => {
-
 }

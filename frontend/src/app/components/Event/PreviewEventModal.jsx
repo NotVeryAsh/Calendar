@@ -2,7 +2,7 @@ import Modal from "@/app/components/Modal";
 import moment from 'moment-timezone';
 import Button from "@/app/components/Button";
 import DangerButton from "@/app/components/DangerButton";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import SuccessButton from "@/app/components/SuccessButton";
 import sendRequest from "@/app/lib/request";
 import { library } from '@fortawesome/fontawesome-svg-core'
@@ -22,11 +22,12 @@ import CallFieldsContent from "@/app/components/Event/CallFields";
 import SettingsFieldsContent, {SettingsFieldsInputs} from "@/app/components/Event/SettingsFields";
 import ColorFieldsContent, {ColorFieldsInputs} from "@/app/components/Event/ColorFields";
 import NotificationFieldsContent, {NotificationFieldsInputs} from "@/app/components/Event/NotificationFields";
+import {getEvents} from "@/app/lib/event";
 
 library.add(faBell, faUsers, faPalette, faClock, faLocationDot, faGear, faPhone, faFont)
 
-export default function PreviewEventModal ({hideModal, setHideModal, event, setEvent, setMessage}) {
-
+export default function PreviewEventModal ({hideModal, setHideModal, event, setEvent, setMessage, setEvents}) {
+    
     const [editMode, setEditMode] = useState(false)
     const [formData, setFormData] = useState({
         startDate: moment(event.start),
@@ -101,19 +102,145 @@ export default function PreviewEventModal ({hideModal, setHideModal, event, setE
             onClick: () => {setActiveTab('settings')}
         }
     ]
+
+    const handleClickSave = async () => {
+        const data = {
+            start: moment.tz(formData.startDate.format('MM/DD/YYYY') + ' ' + formData.startTime.format('HH:mm'), 'MM/DD/YYYY HH:mm', formData.timezone).format(),
+            end: moment.tz(formData.endDate.format('MM/DD/YYYY') + ' ' + formData.endTime.format('HH:mm'), 'MM/DD/YYYY HH:mm', formData.timezone).format(),
+            title: formData.title,
+            guestsCanInviteOthers: formData.guestsCanInviteOthers,
+            guestsCanModify: formData.guestsCanModify,
+            guestsCanSeeOtherGuests: formData.guestsCanSeeOtherGuests,
+            attendees: formData.attendees,
+            attendeesOmitted: formData.attendeesOmitted,
+            status: formData.status
+        }
+
+        // Call api to save data and show error messages where necessary
+        const response = await sendRequest(`/api/event/${event.id}`, "PUT", data);
+
+        if (response.status !== 200) {
+            setMessage({
+                message: 'Something went wrong. Please try again later.',
+                type: 'error'
+            })
+
+            return
+        }
+
+        const json = await response.json();
+
+        setMessage({
+            message: 'Successfully updated the event!',
+            type: 'success'
+        })
+
+        setEvent(json.event)
+
+
+        setEvents(prev => ([
+            ...prev.filter((event) => event.id !== json.event.id),
+            json.event
+        ]))
+
+        setEditMode(false)
+
+        // TODO Is this necessary? If the event is updated over and over, and this endpoint takes a while to come back, that could mean the events become out of sync
+        // TODO We could disable the save button until this comes back
+        // TODO Or only fetch the events when the page loads etc
+        // getEvents().then((events) => {
+        //     setEvents(events)
+        // })
+    }
+
+    const handleInputChange = (property, input) => {
+        let value
+        if(input instanceof moment) {
+            value = input
+        }
+        else if(input.target.type === 'checkbox') {
+            value = input.target.checked
+        }
+        else {
+            value = input.target.value
+        }
+
+        setFormData(prev => ({
+            ...prev,
+            [property]: value
+        }));
+    }
+
+    const handleKeyDown = (keyDownEvent) => {
+        if(keyDownEvent.key !== 'Enter') {
+            return;
+        }
+
+        handleClickSave()
+    }
     
     return (
         <Modal hidden={hideModal} tabs={tabs}>
             <Modal.Content>
                 {editMode ? 
-                    (<Form event={event} formData={formData} setFormData={setFormData} activeTab={activeTab}/>) : 
-                    (<Content event={event} activeTab={activeTab} formData={formData}/>)
+                    (
+                        <>
+                            <div onKeyDown={handleKeyDown}>
+                                <Modal.Title>
+                                    <input className={"text-center p-1 border border-1 border-gray-400 rounded"}
+                                           type={"text"}
+                                           value={formData.title}
+                                           onChange={e => handleInputChange('title', e)}
+                                           placeholder={"title"}
+                                    />
+                                </Modal.Title>
+                                <div className={"flex flex-col space-y-4"}>
+                                    {activeTab === 'dates' &&
+                                        <DateFieldsInputs handleInputChange={handleInputChange} setFormData={setFormData}
+                                                          formData={formData}/>}
+                                </div>
+                                <div className={"flex flex-col space-y-4"}>
+                                    {activeTab === 'users' &&
+                                        <AttendeeFieldsInputs setFormData={setFormData}
+                                                              formData={formData}/>}
+                                </div>
+                                <div className={"flex flex-col space-y-4"}>
+                                    {activeTab === 'settings' &&
+                                        <SettingsFieldsInputs handleInputChange={handleInputChange} setFormData={setFormData}
+                                                              formData={formData} event={event}/>}
+                                </div>
+                                <div className={"flex flex-col space-y-4"}>
+                                    {activeTab === 'colors' &&
+                                        <ColorFieldsInputs handleInputChange={handleInputChange} setFormData={setFormData}
+                                                           formData={formData} event={event}/>}
+                                </div>
+                                <div className={"flex flex-col space-y-4"}>
+                                    {activeTab === 'notifications' &&
+                                        <NotificationFieldsInputs handleInputChange={handleInputChange} setFormData={setFormData}
+                                                                  formData={formData} event={event}/>}
+                                </div>
+                            </div>
+                        </>
+                    ) : 
+                    (
+                        <>
+                            <Modal.Title>{event?.title}</Modal.Title>
+                            <div className={"flex flex-col space-y-5"}>
+                                {activeTab === 'dates' && <DateFieldsContent event={event} formData={formData}/>}
+                                {activeTab === 'users' && <AttendeeFieldsContent event={event}/>}
+                                {activeTab === 'call' && <CallFieldsContent event={event} setMessage={setMessage}/>}
+                                {activeTab === 'settings' && <SettingsFieldsContent event={event} formData={formData}/>}
+                                {activeTab === 'colors' && <ColorFieldsContent event={event} formData={formData}/>}
+                                {activeTab === 'notifications' && <NotificationFieldsContent event={event} formData={formData}/>}
+                            </div>
+                        </>
+                    )
                 }
             </Modal.Content>
             <Modal.Footer setHideModal={setHideModal}>
                 {editMode ? (
                     <>
-                        <SuccessButton onClick={() => handleClickSave(event, formData, setEvent, setMessage)}>Save</SuccessButton>
+                        <SuccessButton onClick={handleClickSave}>Save</SuccessButton>
                         <Button onClick={() => setEditMode(false)}>Cancel</Button>
                     </>
                 ) : (
@@ -126,117 +253,4 @@ export default function PreviewEventModal ({hideModal, setHideModal, event, setE
             </Modal.Footer>
         </Modal>
     );
-}
-
-const Content = ({event, activeTab, formData}) => {
-
-    return (
-        <>
-            <Modal.Title>{event?.title}</Modal.Title>
-            <div className={"flex flex-col space-y-5"}>
-                {activeTab === 'dates' && <DateFieldsContent event={event} formData={formData}/>}
-                {activeTab === 'users' && <AttendeeFieldsContent event={event}/>}
-                {activeTab === 'call' && <CallFieldsContent event={event}/>}
-                {activeTab === 'settings' && <SettingsFieldsContent event={event} formData={formData}/>}
-                {activeTab === 'colors' && <ColorFieldsContent event={event} formData={formData}/>}
-                {activeTab === 'notifications' && <NotificationFieldsContent event={event} formData={formData}/>}
-            </div>
-        </>
-    )
-}
-
-const Form = ({formData, setFormData, activeTab, event}) => {
-    return (
-        <>
-            <form>
-                <Modal.Title>
-                    <input className={"text-center p-1 border border-1 border-gray-400 rounded"}
-                           type={"text"}
-                           value={formData.title}
-                           onChange={e => handleInputChange(setFormData, formData, 'title', e)}
-                           placeholder={"title"}
-                    />
-                </Modal.Title>
-                <div className={"flex flex-col space-y-4"}>
-                    {activeTab === 'dates' &&
-                        <DateFieldsInputs handleInputChange={handleInputChange} setFormData={setFormData}
-                                          formData={formData}/>}
-                </div>
-                <div className={"flex flex-col space-y-4"}>
-                    {activeTab === 'users' &&
-                        <AttendeeFieldsInputs handleInputChange={handleInputChange} setFormData={setFormData}
-                                              formData={formData}/>}
-                </div>
-                <div className={"flex flex-col space-y-4"}>
-                    {activeTab === 'settings' &&
-                        <SettingsFieldsInputs handleInputChange={handleInputChange} setFormData={setFormData}
-                                              formData={formData} event={event}/>}
-                </div>
-                <div className={"flex flex-col space-y-4"}>
-                    {activeTab === 'colors' &&
-                        <ColorFieldsInputs handleInputChange={handleInputChange} setFormData={setFormData}
-                                           formData={formData} event={event}/>}
-                </div>
-                <div className={"flex flex-col space-y-4"}>
-                    {activeTab === 'notifications' &&
-                        <NotificationFieldsInputs handleInputChange={handleInputChange} setFormData={setFormData}
-                                           formData={formData} event={event}/>}
-                </div>
-            </form>
-        </>
-    )
-}
-
-
-const handleClickSave = async (event, formData, setEvent, setMessage) => {
-    const data = {
-        start: moment.tz(formData.startDate.format('MM/DD/YYYY') + ' ' + formData.startTime.format('HH:mm'), 'MM/DD/YYYY HH:mm', formData.timezone).format(),
-        end: moment.tz(formData.endDate.format('MM/DD/YYYY') + ' ' + formData.endTime.format('HH:mm'), 'MM/DD/YYYY HH:mm', formData.timezone).format(),
-        title: formData.title,
-        guestsCanInviteOthers: formData.guestsCanInviteOthers,
-        guestsCanModify: formData.guestsCanModify,
-        guestsCanSeeOtherGuests: formData.guestsCanSeeOtherGuests,
-        attendees: formData.attendees,
-        attendeesOmitted: formData.attendeesOmitted,
-        status: formData.status
-    }
-
-    // Call api to save data and show error messages where necessary
-    const response = await sendRequest(`/api/event/${event.id}`, "PUT", data);
-
-    if (response.status !== 200) {
-        setMessage({
-            message: 'Something went wrong. Please try again later.',
-            type: 'error'
-        })
-        
-        return
-    }
-
-    const json = await response.json();
-
-    setMessage({
-        message: 'Successfully updated the event!',
-        type: 'success'
-    })
-    
-    setEvent(json.event)
-}
-
-const handleInputChange = (setFormData, formData, property, input) => {
-    let value
-    if(input instanceof moment) {
-        value = input
-    }
-    else if(input.target.type === 'checkbox') {
-        value = input.target.checked
-    }
-    else {
-        value = input.target.value
-    }
-
-    setFormData(prev => ({
-        ...prev,
-        [property]: value
-    }));
 }

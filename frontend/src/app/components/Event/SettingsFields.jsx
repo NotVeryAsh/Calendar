@@ -24,13 +24,24 @@ export default function SettingsFieldsContent ({event, formData}) {
 }
 
 export const SettingsFieldsInputs = ({event, formData, setFormData}) => {
+    const handleStatusSelected = (e) => {
+        // TODO Handle condition where cancelled is selected
+        const status = e.target.value
+        setFormData(prev => ({
+            ...prev,
+            ...{
+                status: status
+            }
+        }));
+    }
+    
     return (
         <>
             <div className={"flex flex-col space-y-3"}>
                 <span className={" font-medium"}>Status</span>
                 <div className={"flex flex-col"}>
                     <select onChange={(e) => {
-                        handleStatusSelected(e, setFormData)
+                        handleStatusSelected(e)
                     }}
                             className={"text-center p-2 border border-1 border-gray-400 rounded"}
                             defaultValue={formData.status}>
@@ -44,15 +55,4 @@ export const SettingsFieldsInputs = ({event, formData, setFormData}) => {
             </div>
         </>
     )
-}
-
-const handleStatusSelected = (e, setFormData) => {
-    // Handle condition where cancelled is selected
-    const status = e.target.value
-    setFormData(prev => ({
-        ...prev,
-        ...{
-            status: status 
-        }
-    }));
 }
