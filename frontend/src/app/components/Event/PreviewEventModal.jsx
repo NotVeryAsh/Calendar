@@ -44,7 +44,9 @@ export default function PreviewEventModal ({hideModal, setHideModal, event, setE
         guestsCanSeeOtherGuests: event.guestsCanSeeOtherGuests,
         attendees: event.attendees,
         attendeesOmitted: event.attendeesOmitted,
-        status: event.status
+        status: event.status,
+        colors: Object.entries(event.colors),
+        colorId: event.colorId
     })
     const [activeTab, setActiveTab] = useState(null)
     

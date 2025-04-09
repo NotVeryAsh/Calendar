@@ -36,15 +36,16 @@ export const NotificationFieldsInputs = ({handleInputChange, setFormData, formDa
                 />
                 <label htmlFor={"modify-event"}>Email</label>
             </div>
-            <div className={"flex flex-row !mt-2 space-x-2"}>
-                <input type={"checkbox"} className={"disabled:opacity-80"}
-                       onChange={e => {
-                           handleNotificationTypeChecked(e, 'sms')
-                       }}
-                       checked={true}
-                />
-                <label htmlFor={"invite-others"}>SMS</label>
-            </div>
+            {/* TODO Google does not support this - we will need to add this ourselves */}
+            {/*<div className={"flex flex-row !mt-2 space-x-2"}>*/}
+            {/*    <input type={"checkbox"} className={"disabled:opacity-80"}*/}
+            {/*           onChange={e => {*/}
+            {/*               handleNotificationTypeChecked(e, 'sms')*/}
+            {/*           }}*/}
+            {/*           checked={true}*/}
+            {/*    />*/}
+            {/*    <label htmlFor={"invite-others"}>SMS</label>*/}
+            {/*</div>*/}
             <div className={"flex flex-row !mt-2 space-x-2"}>
                 <input type={"checkbox"} className={"disabled:opacity-80"}
                        onChange={e => {

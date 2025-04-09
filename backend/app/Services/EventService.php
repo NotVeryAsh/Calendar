@@ -318,12 +318,13 @@ class EventService
                 'email' => $organizer->getEmail(),
                 'self' => $organizer->getSelf(),
             ],
+            // TODO Try make more dynamic - get from google            
             'statuses' => [
                 'confirmed',
                 'tentative',
                 'cancelled',
             ],
-            'colors' => Event::getCalendarService()->colors,
+            'colors' => Event::getCalendarService()->colors->get()->getEvent(),
             'colorId' => $event->getColorId()
         ];
     }
