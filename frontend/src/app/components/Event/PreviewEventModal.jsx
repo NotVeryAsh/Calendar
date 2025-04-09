@@ -47,8 +47,7 @@ export default function PreviewEventModal ({hideModal, setHideModal, event, setE
         status: event.status
     })
     const [activeTab, setActiveTab] = useState(null)
-
-    // TODO - When all day is clicked, store the previous end and start times, so if they unselect all day, instead of the start / end times being 12am and 11:59pm, they revert back to what they were before
+    
     // TODO - split each input group into their own components eg. time / day inputs for start time / end time, start date / end date, all day, timezone - since we will have a lot of fields and want it to be clean
     // TODO - Sasha - "Start date, Start time, End date, End time could all be on separate lines instead of start date & time on same line, and end date & time on same line
     

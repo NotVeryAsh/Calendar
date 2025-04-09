@@ -3,12 +3,14 @@ export default function NotificationFieldsContent ({event}) {
     return (
         <>
             <div className={"flex flex-col space-y-2"}>
-            <span className={"font-medium mt-4"}>You will be notified through...</span>
+            <span className={"font-medium mt-4"}>You will be notified via...</span>
                 <ul className={"list-disc px-4"}>
+                    {/* TODO Ask Sasha how she wants these to look / work */}
                     {/* TODO Change conditions below - are these options selected from the event? */}
                     <li className={true ? '' : 'line-through'}>Email</li>
-                    <li className={true ? '' : 'line-through'}>SMS</li>
                     <li className={true ? '' : 'line-through'}>Google</li>
+                    {/* TODO Google does not have SMS support for notifications - we will need to add this */}
+                    {/*<li className={true ? '' : 'line-through'}>SMS</li>*/}
                 </ul>
             </div>
         </>
@@ -23,8 +25,7 @@ export const NotificationFieldsInputs = ({handleInputChange, setFormData, formDa
     
     return (
         <>
-            {/* TODO Change text - it is a little verbose */}
-            <span className={"font-medium mt-4"}>You will be notified through...</span>
+            <span className={"font-medium mt-4"}>You will be notified via...</span>
             <div className={"flex flex-row !mt-2 space-x-2"}>
                 {/* TODO refactor checked - Is it selected? */}
                 <input type={"checkbox"}
