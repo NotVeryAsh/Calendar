@@ -34,7 +34,7 @@ services:
             POSTGRES_USER: '${DB_USERNAME}'
             POSTGRES_PASSWORD: '${DB_PASSWORD:-secret}'
         volumes:
-            - 'pgsql:/var/lib/postgresql/data'
+            - './pgsql:/var/lib/postgresql/data'
         networks:
             - app
         healthcheck:

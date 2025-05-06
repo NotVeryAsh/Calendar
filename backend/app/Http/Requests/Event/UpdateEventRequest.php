@@ -17,6 +17,10 @@ class UpdateEventRequest extends FormRequest
             'title' => [
                 'required',
             ],
+            'description' => [
+                'string',
+                'nullable',
+            ],
             'start' => [
                 'required',
                 'date',

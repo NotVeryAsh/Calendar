@@ -22,7 +22,7 @@ import CallFieldsContent from "@/app/components/Event/CallFields";
 import SettingsFieldsContent, {SettingsFieldsInputs} from "@/app/components/Event/SettingsFields";
 import ColorFieldsContent, {ColorFieldsInputs} from "@/app/components/Event/ColorFields";
 import NotificationFieldsContent, {NotificationFieldsInputs} from "@/app/components/Event/NotificationFields";
-import {getEvents} from "@/app/lib/event";
+import TextFieldsContent, {TextFieldsInputs} from "@/app/components/Event/TextFields";
 
 library.add(faBell, faUsers, faPalette, faClock, faLocationDot, faGear, faPhone, faFont)
 
@@ -109,6 +109,7 @@ export default function PreviewEventModal ({hideModal, setHideModal, event, setE
             start: moment.tz(formData.startDate.format('MM/DD/YYYY') + ' ' + formData.startTime.format('HH:mm'), 'MM/DD/YYYY HH:mm', formData.timezone).format(),
             end: moment.tz(formData.endDate.format('MM/DD/YYYY') + ' ' + formData.endTime.format('HH:mm'), 'MM/DD/YYYY HH:mm', formData.timezone).format(),
             title: formData.title,
+            description: formData.description,
             guestsCanInviteOthers: formData.guestsCanInviteOthers,
             guestsCanModify: formData.guestsCanModify,
             guestsCanSeeOtherGuests: formData.guestsCanSeeOtherGuests,
@@ -196,8 +197,14 @@ export default function PreviewEventModal ({hideModal, setHideModal, event, setE
                                     />
                                 </Modal.Title>
                                 <div className={"flex flex-col space-y-4"}>
+                                    {activeTab === 'text' &&
+                                        <TextFieldsInputs setFormData={setFormData} 
+                                                          formData={formData}/>}
+                                </div>
+                                <div className={"flex flex-col space-y-4"}>
                                     {activeTab === 'dates' &&
-                                        <DateFieldsInputs handleInputChange={handleInputChange} setFormData={setFormData}
+                                        <DateFieldsInputs handleInputChange={handleInputChange}
+                                                          setFormData={setFormData}
                                                           formData={formData}/>}
                                 </div>
                                 <div className={"flex flex-col space-y-4"}>
@@ -207,26 +214,30 @@ export default function PreviewEventModal ({hideModal, setHideModal, event, setE
                                 </div>
                                 <div className={"flex flex-col space-y-4"}>
                                     {activeTab === 'settings' &&
-                                        <SettingsFieldsInputs handleInputChange={handleInputChange} setFormData={setFormData}
+                                        <SettingsFieldsInputs handleInputChange={handleInputChange}
+                                                              setFormData={setFormData}
                                                               formData={formData} event={event}/>}
                                 </div>
                                 <div className={"flex flex-col space-y-4"}>
                                     {activeTab === 'colors' &&
-                                        <ColorFieldsInputs handleInputChange={handleInputChange} setFormData={setFormData}
+                                        <ColorFieldsInputs handleInputChange={handleInputChange}
+                                                           setFormData={setFormData}
                                                            formData={formData} event={event}/>}
                                 </div>
                                 <div className={"flex flex-col space-y-4"}>
                                     {activeTab === 'notifications' &&
-                                        <NotificationFieldsInputs handleInputChange={handleInputChange} setFormData={setFormData}
+                                        <NotificationFieldsInputs handleInputChange={handleInputChange}
+                                                                  setFormData={setFormData}
                                                                   formData={formData} event={event}/>}
                                 </div>
                             </div>
                         </>
-                    ) : 
+                    ) :
                     (
                         <>
                             <Modal.Title>{event?.title}</Modal.Title>
                             <div className={"flex flex-col space-y-5"}>
+                                {activeTab === 'text' && <TextFieldsContent event={event}/>}
                                 {activeTab === 'dates' && <DateFieldsContent event={event} formData={formData}/>}
                                 {activeTab === 'users' && <AttendeeFieldsContent event={event}/>}
                                 {activeTab === 'call' && <CallFieldsContent event={event} setMessage={setMessage}/>}

@@ -300,11 +300,13 @@ class EventService
         // TODO Add all relevant properties eg. calendar color, link, other people invited etc.
         // TODO Allow user to choose custom color for event - or preset from google's colors
         // TODO Eventually, if this endpoint is kinda slow, we can split it up into categories -> only return data for that category
+        // TODO Can replace with a DTO
         return [
-            "id" => $event->id,
-            "title" => $event->summary,
-            "start" => $event->getStart()->dateTime,
-            "end" => $event->getEnd()->dateTime,
+            "id" => $event->getId(),
+            "title" => $event->getSummary(),
+            'description' => $event->getDescription(),
+            "start" => $event->getStart()->getDateTime(),
+            "end" => $event->getEnd()->getDateTime(),
             "guestsCanModify" => $event->getGuestsCanModify(),
             "guestsCanInviteOthers" => $event->getGuestsCanInviteOthers(),
             "guestsCanSeeOtherGuests" => $event->getGuestsCanSeeOtherGuests(),
@@ -318,7 +320,7 @@ class EventService
                 'email' => $organizer->getEmail(),
                 'self' => $organizer->getSelf(),
             ],
-            // TODO Try make more dynamic - get from google            
+            // TODO Try make more dynamic - get from google
             'statuses' => [
                 'confirmed',
                 'tentative',
