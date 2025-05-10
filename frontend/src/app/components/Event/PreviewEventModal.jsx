@@ -37,6 +37,7 @@ export default function PreviewEventModal ({hideModal, setHideModal, event, setE
         originalEndTime: moment(event.end),
         endTime: moment(event.end),
         title: event.title,
+        description: event.description,
         allDay: false,
         timezone: event.timezone,
         guestsCanInviteOthers: event.guestsCanInviteOthers,

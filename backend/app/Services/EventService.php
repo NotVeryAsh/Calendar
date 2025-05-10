@@ -203,7 +203,7 @@ class EventService
         // ** creator        
         // created (Read only)
         // creator (Read only)
-        // description (Can contain HTML) (Check how we can safely validate and sanitize this)
+        // description (Can contain HTML) (Check how we can safely validate and sanitize this) (DONE)
         // organizer (Read only except when importing an event) (DONE)
         
         // ** time        
